@@ -5,100 +5,138 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>📚 학급문고 대출·반납</title>
 <style>
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css");
+@import url("https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&display=swap");
 *{box-sizing:border-box}
-:root{--bg:#f5f3ee;--card:#fff;--ink:#23262e;--mute:#6b7080;--line:#e3e0d8;--pri:#2f6f5e;--pri2:#e4f1ec;--warn:#c2410c;--warn2:#fde8dc;--ok:#15803d;--ok2:#dcfce7;--r:14px}
-html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif;font-size:16px;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#E9ECE6; --paper:#FFFFFF; --ink:#1E2B25; --ink2:#4B5650; --mute:#87918A; --line:#D8DDD5; --line2:#E9ECE6;
+  --pri:#1E2B25; --acc:#B0843A; --acc2:#F3EAD6; --ok:#2F6B57; --ok2:#E3EFEA; --warn:#B4472F; --warn2:#F7E6E1;
+  --serif:"Gowun Batang","Nanum Myeongjo",serif;
+  --sans:"Pretendard Variable","Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --shadow:0 1px 2px rgba(30,43,37,.06),0 6px 18px -8px rgba(30,43,37,.14);
+}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;font-feature-settings:"tnum" 1}
 button,input,select,textarea{font:inherit;color:inherit}
-button{cursor:pointer;border:1px solid var(--line);background:var(--card);border-radius:10px;padding:9px 14px}
-button:hover{border-color:#c9c4b8}
-button:disabled{opacity:.45;cursor:default}
-.btn{background:var(--pri);color:#fff;border-color:var(--pri);font-weight:700}
-.btn:hover{filter:brightness(1.08);border-color:var(--pri)}
-.ghost{background:transparent}
-.sm{padding:5px 10px;font-size:14px;border-radius:8px}
+button{cursor:pointer;border:1px solid var(--line);background:var(--paper);border-radius:8px;padding:9px 14px;font-weight:600;transition:border-color .15s,background .15s}
+button:hover{border-color:#B9C0CC}
+button:focus-visible,a:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+button:disabled{opacity:.4;cursor:default}
+.btn{background:var(--ink);color:#fff;border-color:var(--ink)}
+.btn:hover{background:#2D3E35;border-color:#2D3E35}
+.ghost{background:transparent;border-color:transparent}
+.sm{padding:5px 11px;font-size:13.5px;border-radius:7px}
 .danger{color:var(--warn)}
-input,select,textarea{border:1px solid var(--line);border-radius:10px;padding:9px 12px;background:#fff;min-width:0}
-input:focus,select:focus,textarea:focus{outline:2px solid var(--pri);outline-offset:0;border-color:var(--pri)}
-textarea{width:100%;min-height:130px;resize:vertical;line-height:1.5}
-header{position:sticky;top:0;z-index:20;background:var(--ink);color:#fff;display:flex;align-items:center;gap:12px;padding:10px 18px;flex-wrap:wrap}
-header h1{font-size:19px;margin:0;font-weight:800;letter-spacing:-.3px}
+input,select,textarea{border:1px solid var(--line);border-radius:8px;padding:9px 12px;background:var(--paper);min-width:0}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--ink);box-shadow:0 0 0 3px rgba(30,43,37,.08)}
+textarea{width:100%;min-height:130px;resize:vertical;line-height:1.6}
+a{color:var(--ink)}
+header{position:sticky;top:0;z-index:20;background:var(--paper);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:28px;padding:0 28px;height:62px}
+header h1{font-family:var(--serif);font-size:20px;margin:0;font-weight:700;letter-spacing:-.2px;white-space:nowrap;display:flex;align-items:center;gap:10px}
+header h1 .mark{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:7px;background:var(--ink);color:var(--acc);font-size:15px}
+nav{display:flex;gap:2px;height:100%;overflow-x:auto}
+nav button{border:none;background:transparent;border-radius:0;padding:0 14px;height:100%;color:var(--mute);font-weight:600;font-size:15px;border-bottom:2px solid transparent;white-space:nowrap}
+nav button:hover{color:var(--ink)}
+nav button[aria-current=true]{color:var(--ink);border-bottom-color:var(--acc)}
 header .sp{flex:1}
-.sync{font-size:13px;padding:4px 10px;border-radius:99px;background:#ffffff1f;white-space:nowrap}
-.sync.err{background:#c2410c}
-nav{display:flex;gap:4px;padding:10px 18px 0;flex-wrap:wrap;border-bottom:1px solid var(--line);background:var(--bg);position:sticky;top:52px;z-index:15}
-nav button{border:none;background:transparent;border-radius:10px 10px 0 0;padding:10px 14px;color:var(--mute);font-weight:600}
-nav button[aria-current=true]{background:var(--card);color:var(--ink);box-shadow:0 -1px 0 var(--line) inset,1px 0 0 var(--line),-1px 0 0 var(--line)}
-main{padding:18px;max-width:1280px;margin:0 auto}
-.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;margin-bottom:14px}
-.card h2{font-size:17px;margin:0 0 10px}
+.sync{font-size:12.5px;color:var(--mute);white-space:nowrap;display:flex;align-items:center;gap:6px}
+.sync::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--ok)}
+.sync.local::before{background:var(--acc)}
+.sync.saving::before{background:var(--mute)}
+.sync.err{color:var(--warn)}.sync.err::before{background:var(--warn)}
+main{padding:28px;max-width:1240px;margin:0 auto}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:22px 24px;margin-bottom:18px}
+.card h2{font-size:17px;margin:0 0 14px;font-weight:700;letter-spacing:-.2px}
+.head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.head h2{margin:0}
+.title{font-family:var(--serif);font-size:28px;font-weight:700;margin:0 0 4px;letter-spacing:-.4px}
 .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .muted{color:var(--mute);font-size:14px}
-.pill{display:inline-block;font-size:12.5px;padding:2px 9px;border-radius:99px;background:var(--pri2);color:var(--pri);font-weight:700;white-space:nowrap}
+.pill{display:inline-block;font-size:12px;padding:2px 9px;border-radius:99px;background:var(--line2);color:var(--ink2);font-weight:600;white-space:nowrap;vertical-align:middle}
 .pill.warn{background:var(--warn2);color:var(--warn)}
-.pill.gray{background:#eee;color:#666}
+.pill.ok{background:var(--ok2);color:var(--ok)}
+.pill.acc{background:var(--acc2);color:#8A6418}
 table.list{width:100%;border-collapse:collapse;font-size:15px}
-table.list th,table.list td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
-table.list th{font-size:13px;color:var(--mute);font-weight:600;background:#faf9f6}
-.empty{padding:28px;text-align:center;color:var(--mute)}
-.modal{position:fixed;inset:0;background:#0007;display:flex;align-items:center;justify-content:center;z-index:100;padding:16px}
-.mbox{background:#fff;border-radius:18px;padding:22px;max-width:560px;width:100%;max-height:90vh;overflow:auto;box-shadow:0 20px 60px #0004}
-.mbox h3{margin:0 0 12px;font-size:20px}
-#toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(30px);background:var(--ink);color:#fff;padding:12px 20px;border-radius:12px;opacity:0;transition:.25s;z-index:200;pointer-events:none;font-weight:600;max-width:90vw;text-align:center}
+table.list th,table.list td{padding:11px 12px;border-bottom:1px solid var(--line2);text-align:left;vertical-align:middle}
+table.list th{font-size:12.5px;color:var(--mute);font-weight:600}
+table.list tr:last-child td{border-bottom:none}
+.empty{padding:36px;text-align:center;color:var(--mute)}
+.modal{position:fixed;inset:0;background:rgba(30,43,37,.42);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;z-index:100;padding:16px;animation:fade .15s}
+.mbox{background:var(--paper);border-radius:14px;padding:26px 28px;max-width:540px;width:100%;max-height:90vh;overflow:auto;box-shadow:0 30px 80px -20px rgba(30,43,37,.45);animation:rise .2s ease-out}
+.mbox h3{margin:0 0 14px;font-size:20px;font-family:var(--serif)}
+@keyframes fade{from{opacity:0}}@keyframes rise{from{opacity:0;transform:translateY(8px)}}
+#toast{position:fixed;left:50%;bottom:32px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:13px 22px;border-radius:10px;opacity:0;transition:.22s;z-index:200;pointer-events:none;font-weight:600;font-size:15px;max-width:90vw;text-align:center;box-shadow:var(--shadow)}
 #toast.show{opacity:1;transform:translateX(-50%)}
 #toast.bad{background:var(--warn)}
-.banner{background:#fff7d6;border:1px solid #f0dc8c;border-radius:12px;padding:10px 14px;margin-bottom:14px;font-size:14.5px}
-label.f{display:block;font-size:14px;color:var(--mute);margin:10px 0 4px;font-weight:600}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-@media(max-width:800px){.grid2{grid-template-columns:1fr}nav{top:auto;position:static}}
+.banner{border:1px dashed #D9C08A;background:var(--acc2);border-radius:10px;padding:10px 16px;margin-bottom:20px;font-size:14px;color:#6E5520}
+label.f{display:block;font-size:13.5px;color:var(--ink2);margin:14px 0 6px;font-weight:600}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+.seg{display:inline-flex;background:var(--line2);border-radius:9px;padding:3px}
+.seg button{border:none;background:transparent;border-radius:7px;padding:7px 14px;color:var(--ink2)}
+.seg button[aria-pressed=true]{background:var(--paper);color:var(--ink);box-shadow:0 1px 3px rgba(30,43,37,.12)}
+@media(max-width:860px){header{padding:0 14px;gap:12px;height:auto;flex-wrap:wrap;padding-top:10px}nav{height:46px;width:100%;order:3}main{padding:16px}.grid2{grid-template-columns:1fr}.card{padding:18px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
-.stu-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
-.stu{position:relative;padding:18px 8px;border-radius:16px;font-size:20px;font-weight:800;background:#fff;border:2px solid var(--line);text-align:center}
-.stu small{display:block;font-size:13px;color:var(--mute);font-weight:600;margin-bottom:2px}
-.stu:hover{border-color:var(--pri);background:var(--pri2)}
-.badge{position:absolute;top:6px;right:8px;font-size:12px;background:var(--pri);color:#fff;border-radius:99px;padding:1px 8px;font-weight:700}
-.badge.late{background:var(--warn)}
-.book-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px}
-.book{text-align:left;padding:12px 14px;border-radius:14px;border:2px solid var(--line);background:#fff;display:flex;gap:10px;align-items:flex-start;min-height:74px}
-.book:hover{border-color:var(--pri);background:var(--pri2)}
-.book .ic{font-size:26px;line-height:1}
-.book b{display:block;font-size:16px;line-height:1.3}
-.book span{font-size:13px;color:var(--mute)}
-.mine{display:flex;gap:12px;align-items:center;padding:12px 14px;border:2px solid var(--line);border-radius:14px;background:#fff;margin-bottom:8px;flex-wrap:wrap}
-.mine.late{border-color:#f1b394;background:var(--warn2)}
-.mine .t{flex:1;min-width:180px}
-.mine .t b{font-size:17px}
-.big{font-size:18px;padding:12px 22px;border-radius:12px}
-.who{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
-.who h2{margin:0;font-size:26px}
-.quick{display:flex;gap:8px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px 14px;margin-bottom:16px;flex-wrap:wrap}
-.quick input{flex:1;min-width:160px;font-size:17px}
-tr.late td{background:#fff3ec}
-.bars div{display:flex;align-items:center;gap:8px;margin:5px 0;font-size:15px}
-.bars i{display:block;height:18px;background:var(--pri);border-radius:5px;min-width:3px}
-.bars span.n{width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.desk-top{display:flex;gap:16px;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;margin-bottom:22px}
+.quick{display:flex;align-items:center;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:4px 4px 4px 14px;min-width:min(420px,100%)}
+.quick span{font-size:13.5px;color:var(--mute);white-space:nowrap;margin-right:8px}
+.quick input{flex:1;border:none;font-size:16px;padding:8px 6px;box-shadow:none!important}
+.stu-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.stu{position:relative;text-align:left;padding:14px 16px 16px;border-radius:10px;background:var(--paper);border:1px solid var(--line);min-height:92px;display:flex;flex-direction:column;justify-content:space-between}
+.stu:hover{border-color:var(--ink);transform:translateY(-1px)}
+.stu .no{font-size:12.5px;color:var(--mute);font-weight:600}
+.stu .nm{font-size:20px;font-weight:700;letter-spacing:-.3px}
+.stu .lo{position:absolute;top:13px;right:14px;font-size:12px;font-weight:700;color:#8A6418;display:flex;align-items:center;gap:5px}
+.stu .lo::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--acc)}
+.stu .lo.late{color:var(--warn)}.stu .lo.late::before{background:var(--warn)}
+.shelf{display:grid;grid-template-columns:repeat(auto-fill,minmax(138px,1fr));gap:22px 18px}
+.cover{position:relative;aspect-ratio:3/4;border:none;border-radius:3px 9px 9px 3px;color:#fff;padding:16px 14px 12px 20px;display:flex;flex-direction:column;text-align:left;background:var(--c);box-shadow:inset 7px 0 0 rgba(0,0,0,.22),inset 8px 0 0 rgba(255,255,255,.12),0 2px 4px rgba(24,33,58,.12),0 12px 22px -12px rgba(24,33,58,.45);transition:transform .18s}
+.cover:hover:not(:disabled){transform:translateY(-4px) rotate(-.6deg)}
+.cover:disabled{opacity:.35}
+.cover b{font-family:var(--serif);font-size:16.5px;line-height:1.35;font-weight:700;word-break:keep-all}
+.cover i{font-style:normal;font-size:12px;opacity:.75;margin-top:6px}
+.cover small{margin-top:auto;font-size:11px;opacity:.6;letter-spacing:.5px}
+.cover::after{content:"";position:absolute;left:20px;right:14px;bottom:30px;height:1px;background:rgba(255,255,255,.28)}
+.who{display:flex;align-items:flex-end;gap:18px;margin-bottom:24px;flex-wrap:wrap}
+.who .title{margin:0}
+.loan{display:flex;gap:16px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line2)}
+.loan:last-child{border-bottom:none}
+.loan .mini{width:42px;height:56px;border-radius:2px 5px 5px 2px;background:var(--c);box-shadow:inset 4px 0 0 rgba(0,0,0,.2);flex:none}
+.loan .t{flex:1;min-width:0}
+.loan .t b{font-family:var(--serif);font-size:18px}
+.big{font-size:16px;padding:11px 22px;border-radius:9px}
+.search{width:min(360px,100%)}
+tr.late td{background:#FBF1EE}
+.bars div{display:grid;grid-template-columns:130px 1fr 36px;align-items:center;gap:12px;margin:9px 0;font-size:14.5px}
+.bars i{display:block;height:8px;background:var(--ink);border-radius:4px;min-width:3px}
+.bars div:first-child i{background:var(--acc)}
+.bars span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bars b{text-align:right}
 #print{display:none}
-@media print{body>*:not(#print){display:none!important}#print{display:grid!important;grid-template-columns:repeat(4,1fr);gap:0}
+@media print{body>*:not(#print){display:none!important}#print{display:grid!important;grid-template-columns:repeat(4,1fr)}
 #print div{border:1px dashed #999;padding:8px;height:26mm;font-size:11pt;overflow:hidden}#print b{font-size:18pt;display:block}}
 </style>
 </head>
 <body>
 <header>
-  <h1>📚 학급문고 대출·반납</h1>
+  <h1><span class="mark" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 4h6a2 2 0 0 1 2 2v14a2 2 0 0 0-2-2H4zM20 4h-6a2 2 0 0 0-2 2v14a2 2 0 0 1 2-2h6z"/></svg></span>학급문고</h1>
+  <nav id="nav"></nav>
   <span class="sp"></span>
-  <span class="sync" id="sync">…</span>
-  <button class="sm ghost" id="lockBtn" style="color:#fff;border-color:#ffffff55" hidden>🔒 잠그기</button>
+  <span class="sync" id="sync"></span>
+  <a class="sm" id="swap" style="font-size:13px;color:var(--mute);text-decoration:none"></a>
 </header>
-<nav id="nav"></nav>
 <main id="main"></main>
 <div id="print"></div>
 <script>
+const PAGE = 'student';
 const APP_NAME = '학급문고 대출·반납';
 const SCHEMA = {
   students: [['no', '번호'], ['name', '이름']],
   books: [['id', '도서번호'], ['title', '제목'], ['author', '지은이'], ['status', '상태'], ['memo', '메모']],
+  settings: [['key', '항목'], ['val', '값']],
   loans: [['lid', '기록번호'], ['bookId', '도서번호'], ['title', '제목'], ['no', '번호'], ['name', '이름'], ['out', '대출일'], ['due', '반납예정일'], ['back', '반납일']]
 };
-const SHEETNAMES = { students: '학생', books: '도서', loans: '대출기록' };
+const SHEETNAMES = { students: '학생', books: '도서', settings: '설정', loans: '대출기록' };
+function optOf(db) { const g = k => (db.settings || []).find(x => x.key === k); const d = g('대출기간'), m = g('최대권수'); return { days: d ? Number(d.val) || 7 : 7, max: m ? Number(m.val) : 2 }; }
 const MERGE_ACTIONS = [];
 
 function addDays(ds, n) {
@@ -156,10 +194,10 @@ function core(db, req, today) {
       if (b.status === '대출중') fail('『' + b.title + '』은(는) 이미 누가 빌려 갔어요.');
       if (b.status !== '대출가능') fail('『' + b.title + '』은(는) 지금 빌릴 수 없는 책이에요(' + b.status + ').');
       if (!db.students.some(s => s.no === S(p.no) && s.name === S(p.name))) fail('학생 명단에 없는 학생이에요.');
-      const max = Number(p.max) || 0;
+      const opt = optOf(db), max = opt.max;
       const mine = db.loans.filter(l => !l.back && l.no === S(p.no) && l.name === S(p.name)).length;
       if (max && mine >= max) fail('한 사람이 ' + max + '권까지 빌릴 수 있어요. 먼저 반납해 주세요.');
-      db.loans.push({ lid: 'L' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), bookId: b.id, title: b.title, no: S(p.no), name: S(p.name), out: today, due: addDays(today, p.days || 7), back: '' });
+      db.loans.push({ lid: 'L' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), bookId: b.id, title: b.title, no: S(p.no), name: S(p.name), out: today, due: addDays(today, opt.days), back: '' });
       b.status = '대출중'; dirty.books = dirty.loans = 1; break;
     }
     case 'return': {
@@ -169,7 +207,12 @@ function core(db, req, today) {
     }
     case 'extend': {
       const l = db.loans.find(x => x.lid === S(p.lid) && !x.back) || fail('대출 기록을 찾지 못했어요.');
-      l.due = addDays(l.due > today ? l.due : today, p.days || 7); dirty.loans = 1; break;
+      l.due = addDays(l.due > today ? l.due : today, optOf(db).days); dirty.loans = 1; break;
+    }
+    case 'setOpt': {
+      const set = (k, v) => { const r = db.settings.find(x => x.key === k); if (r) r.val = String(v); else db.settings.push({ key: k, val: String(v) }); };
+      set('대출기간', Math.max(1, Math.min(60, Number(p.days) || 7))); set('최대권수', Math.max(0, Math.min(20, Number(p.max) || 0)));
+      dirty.settings = 1; break;
     }
     default: fail('알 수 없는 요청: ' + req.action);
   }
@@ -278,9 +321,11 @@ function DEMO() {
     loans: []
   };
 }
-const OPT = () => Object.assign({ days: 7, max: 2, pin: '' }, LS.get(APP_KEY + '-opt', {}));
-const TABS = [['desk', '🏫 대출·반납'], ['now', '📋 대출 현황'], ['books', '📚 도서 관리'], ['stu', '👧 학생'], ['stat', '📊 통계'], ['set', '⚙️ 설정']];
-const UI = { tab: 'desk', who: null, q: '', bq: '', unlocked: false, histQ: '', from: '' };
+const OPT = () => optOf(Store.db);
+const TABS = PAGE === 'student' ? [] : [['now', '대출 현황'], ['books', '도서'], ['stu', '학생'], ['stat', '통계'], ['set', '설정']];
+const CLOTH = ['#2E4A3E', '#6E2F2F', '#27395A', '#7B5A26', '#4A3A5E', '#335D63', '#8C4A30', '#3B4656', '#5B6B2E', '#2F5470'];
+function cloth(t) { let h = 0; for (const ch of String(t)) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return CLOTH[h % CLOTH.length]; }
+const UI = { tab: PAGE === 'student' ? 'desk' : 'now', who: null, q: '', bq: '', unlocked: false, histQ: '', from: '' };
 const $ = s => document.querySelector(s);
 const W = ['일', '월', '화', '수', '목', '금', '토'];
 function md(ds) { if (!ds) return ''; const p = ds.split('-').map(Number), d = new Date(p[0], p[1] - 1, p[2]); return p[1] + '/' + p[2] + '(' + W[d.getDay()] + ')'; }
@@ -290,53 +335,44 @@ function loansOf(s) { return openLoans().filter(l => l.no === s.no && l.name ===
 function stuKey(s) { return s.no + '|' + s.name; }
 function findStu(k) { return Store.db.students.find(s => stuKey(s) === k); }
 
-function go(tab) {
-  if (tab !== 'desk' && OPT().pin && !UI.unlocked) {
-    return modal(`<h3>🔐 선생님 확인</h3><p class="muted">선생님 메뉴는 비밀번호가 있어야 열려요.</p><input id="pinIn" type="password" inputmode="numeric" style="width:100%;font-size:20px" autocomplete="off"><div class="row" style="margin-top:14px;justify-content:flex-end"><button data-close>취소</button><button class="btn" id="pinOk">열기</button></div>`, m => {
-      const ok = () => { if (m.querySelector('#pinIn').value === OPT().pin) { UI.unlocked = true; m.remove(); go(tab); } else toast('비밀번호가 달라요', true); };
-      m.querySelector('#pinOk').onclick = ok; m.querySelector('#pinIn').onkeydown = e => e.key === 'Enter' && ok(); setTimeout(() => m.querySelector('#pinIn').focus(), 50);
-    });
-  }
-  UI.tab = tab; render();
-}
+function go(tab) { UI.tab = tab; render(); }
 function render(soft) {
   $('#nav').innerHTML = TABS.map(t => `<button data-tab="${t[0]}" aria-current="${UI.tab === t[0]}">${t[1]}</button>`).join('');
-  $('#lockBtn').hidden = !(OPT().pin && UI.unlocked);
   if (soft && document.activeElement && document.activeElement.tagName === 'INPUT' && UI.tab !== 'desk') return; // 입력 중에는 새로고침으로 방해하지 않기
   const f = { desk: vDesk, now: vNow, books: vBooks, stu: vStu, stat: vStat, set: vSet }[UI.tab];
   const keep = document.activeElement && document.activeElement.id, pos = keep && document.activeElement.selectionStart;
-  $('#main').innerHTML = (Store.remote() ? '' : `<div class="banner">🧪 <b>체험 모드</b> — 지금은 이 기기에만 저장돼요. 구글 시트에 연결하려면 <a href="#" onclick="go('set');return false">⚙️ 설정</a>에서 주소를 넣어 주세요.</div>`) + f();
+  $('#main').innerHTML = (Store.remote() ? '' : (PAGE === 'student' ? `<div class="banner"><b>체험 모드</b>로 열려 있어요. 기록이 이 기기에만 저장돼요. 선생님 관리 페이지의 설정에서 만든 <b>학생용 주소</b>로 열면 구글 시트에 연결돼요.</div>` : `<div class="banner"><b>체험 모드</b>로 열려 있어요. 기록이 이 기기에만 저장돼요. 구글 시트에 연결하려면 <a href="#" onclick="go('set');return false">설정</a>에서 주소를 넣어 주세요.</div>`)) + f();
   if (keep) { const el = document.getElementById(keep); if (el && el.tagName === 'INPUT') { el.focus(); try { el.setSelectionRange(pos, pos); } catch (_) {} } }
 }
 
 /* ---------- 대출·반납 (학생용 화면) ---------- */
 function vDesk() {
-  const quick = `<div class="quick"><b>📕 빠른 반납</b><input id="qret" placeholder="도서번호(예: B003)를 입력하고 Enter" autocomplete="off"><button class="btn" onclick="quickReturn()">반납</button></div>`;
+  const quick = `<label class="quick"><span>빠른 반납</span><input id="qret" placeholder="도서번호 입력 후 Enter" autocomplete="off"><button class="btn sm" onclick="quickReturn()">반납</button></label>`;
   const s = UI.who && findStu(UI.who);
   if (!s) {
-    if (!Store.db.students.length) return quick + `<div class="card empty">학생 명단이 없어요. <b>👧 학생</b> 탭에서 먼저 등록해 주세요.</div>`;
-    return quick + `<div class="card"><h2>누가 빌리거나 반납하나요? 내 이름을 눌러요 👇</h2><div class="stu-grid">${Store.db.students.map(s => {
+    const top = `<div class="desk-top"><div><p class="title">누가 왔나요?</p><p class="muted" style="margin:0">내 이름을 누르면 빌리거나 반납할 수 있어요.</p></div>${quick}</div>`;
+    if (!Store.db.students.length) return top + `<div class="card empty">학생 명단이 비어 있어요. 선생님 관리 페이지에서 학생을 먼저 등록해 주세요.</div>`;
+    return top + `<div class="stu-grid">${Store.db.students.map(s => {
       const ls = loansOf(s), lt = ls.some(late);
-      return `<button class="stu" onclick="UI.who='${esc(stuKey(s))}';UI.q='';render()"><small>${esc(s.no)}번</small>${esc(s.name)}${ls.length ? `<span class="badge${lt ? ' late' : ''}">${lt ? '⏰ ' : ''}${ls.length}권</span>` : ''}</button>`;
-    }).join('')}</div></div>`;
+      return `<button class="stu" onclick="UI.who='${esc(stuKey(s))}';UI.q='';render()"><span class="no">${esc(s.no)}번</span><span class="nm">${esc(s.name)}</span>${ls.length ? `<span class="lo${lt ? ' late' : ''}">${lt ? '반납일 지남' : ls.length + '권'}</span>` : ''}</button>`;
+    }).join('')}</div>`;
   }
   const mine = loansOf(s), o = OPT(), full = o.max && mine.length >= o.max;
   const q = UI.q.trim().toLowerCase();
   const avail = Store.db.books.filter(b => b.status === '대출가능' && (!q || (b.title + ' ' + b.author + ' ' + b.id).toLowerCase().includes(q)));
-  return quick + `<div class="who"><button class="big" onclick="UI.who=null;render()">◀ 처음으로</button><h2>${esc(s.no)}번 ${esc(s.name)}</h2>${o.max ? `<span class="pill">${mine.length} / ${o.max}권 빌림</span>` : ''}</div>
-  <div class="card"><h2>📕 내가 빌린 책</h2>${mine.length ? mine.map(l => `<div class="mine${late(l) ? ' late' : ''}"><div class="t"><b>${esc(l.title)}</b><div class="muted">${esc(l.bookId)} · ${md(l.out)}에 빌림 · 반납일 <b>${md(l.due)}</b> ${late(l) ? '<span class="pill warn">반납일 지남</span>' : ''}</div></div><button class="btn big" onclick="doReturn('${esc(l.bookId)}')">반납하기</button></div>`).join('') : '<p class="muted">빌린 책이 없어요.</p>'}</div>
-  <div class="card"><h2>📗 빌릴 책 고르기 ${full ? '<span class="pill warn">더 빌리려면 먼저 반납해요</span>' : ''}</h2>
-  <div class="row" style="margin-bottom:12px"><input id="bsearch" style="flex:1;font-size:17px" placeholder="🔍 책 제목, 지은이, 도서번호로 찾기" value="${esc(UI.q)}" oninput="UI.q=this.value;render()" autocomplete="off"></div>
-  ${avail.length ? `<div class="book-grid">${avail.map(b => `<button class="book" ${full ? 'disabled' : ''} onclick="askBorrow('${esc(b.id)}')"><span class="ic">📘</span><div><b>${esc(b.title)}</b><span>${esc(b.author || '')} ${esc(b.id)}</span></div></button>`).join('')}</div>` : `<p class="muted">${q ? '찾는 책이 없거나 이미 누가 빌려 갔어요.' : '지금 빌릴 수 있는 책이 없어요.'}</p>`}</div>`;
+  return `<div class="who"><button onclick="UI.who=null;render()">‹ 처음으로</button><p class="title">${esc(s.name)}</p><span class="muted" style="padding-bottom:6px">${esc(s.no)}번${o.max ? ` · ${mine.length}/${o.max}권 빌림` : ''}</span><span style="flex:1"></span>${quick}</div>
+  ${mine.length ? `<div class="card"><h2>빌린 책</h2>${mine.map(l => `<div class="loan"><span class="mini" style="--c:${cloth(l.title)}"></span><div class="t"><b>${esc(l.title)}</b><div class="muted">${md(l.out)}에 빌림 · ${md(l.due)}까지 ${late(l) ? '<span class="pill warn">반납일 지남</span>' : ''}</div></div><button class="btn big" onclick="doReturn('${esc(l.bookId)}')">반납하기</button></div>`).join('')}</div>` : ''}
+  <div class="card"><div class="head"><h2>${full ? '더 빌리려면 먼저 반납해요' : '빌릴 책을 골라요'}</h2><input id="bsearch" class="search" placeholder="제목, 지은이, 도서번호로 찾기" value="${esc(UI.q)}" oninput="UI.q=this.value;render()" autocomplete="off"></div>
+  ${avail.length ? `<div class="shelf">${avail.map(b => `<button class="cover" style="--c:${cloth(b.title)}" ${full ? 'disabled' : ''} onclick="askBorrow('${esc(b.id)}')"><b>${esc(b.title)}</b>${b.author ? `<i>${esc(b.author)}</i>` : ''}<small>${esc(b.id)}</small></button>`).join('')}</div>` : `<p class="muted">${q ? '찾는 책이 없거나 이미 누가 빌려 갔어요.' : '지금 빌릴 수 있는 책이 없어요.'}</p>`}</div>`;
 }
 function askBorrow(id) {
   const s = findStu(UI.who), b = Store.db.books.find(x => x.id === id); if (!s || !b) return;
   const due = addDays(todayStr(), OPT().days);
-  modal(`<h3>📘 이 책을 빌릴까요?</h3><p style="font-size:20px;margin:6px 0"><b>${esc(b.title)}</b></p><p class="muted">${esc(s.name)} · 반납일 <b>${md(due)}</b>까지</p><div class="row" style="justify-content:flex-end;margin-top:16px"><button class="big" data-close>아니요</button><button class="btn big" id="yes">빌릴게요!</button></div>`, m => {
-    m.querySelector('#yes').onclick = () => { m.remove(); if (Store.run('borrow', { bookId: id, no: s.no, name: s.name, days: OPT().days, max: OPT().max })) { toast('✅ 『' + b.title + '』 빌렸어요! ' + md(due) + '까지 반납해요'); UI.who = null; UI.q = ''; render(); } };
+  modal(`<div class="loan" style="border:none;padding:0 0 6px"><span class="mini" style="--c:${cloth(b.title)};width:64px;height:86px"></span><div class="t"><p class="muted" style="margin:0 0 4px">${esc(s.name)}, 이 책을 빌릴까요?</p><b style="font-size:22px">${esc(b.title)}</b><p class="muted" style="margin:6px 0 0"><b style="font-family:var(--sans);font-size:14px;color:var(--ink)">${md(due)}</b>까지 반납해요</p></div></div><div class="row" style="justify-content:flex-end;margin-top:18px"><button class="big" data-close>아니요</button><button class="btn big" id="yes">빌리기</button></div>`, m => {
+    m.querySelector('#yes').onclick = () => { m.remove(); if (Store.run('borrow', { bookId: id, no: s.no, name: s.name })) { toast('『' + b.title + '』을(를) 빌렸어요. ' + md(due) + '까지 반납해요'); UI.who = null; UI.q = ''; render(); } };
   });
 }
-function doReturn(id) { const b = Store.db.books.find(x => x.id === id); if (Store.run('return', { bookId: id })) toast('📗 『' + (b ? b.title : id) + '』 반납했어요. 고마워요!'); }
+function doReturn(id) { const b = Store.db.books.find(x => x.id === id); if (Store.run('return', { bookId: id })) toast('『' + (b ? b.title : id) + '』을(를) 반납했어요'); }
 function quickReturn() {
   const el = $('#qret'), v = el.value.trim(); if (!v) return;
   let b = Store.db.books.find(x => x.id.toLowerCase() === v.toLowerCase());
@@ -350,15 +386,15 @@ function vNow() {
   const ls = openLoans().sort((a, b) => a.due.localeCompare(b.due)), lt = ls.filter(late);
   const hq = UI.histQ.trim();
   const hist = Store.db.loans.filter(l => !hq || (l.name + l.title + l.no).includes(hq)).slice().reverse().slice(0, 300);
-  return `<div class="card"><div class="row" style="justify-content:space-between"><h2>지금 빌려 간 책 ${ls.length}권 ${lt.length ? `<span class="pill warn">반납일 지남 ${lt.length}권</span>` : ''}</h2>
-  ${lt.length ? `<button class="sm" onclick="copyLate()">📋 연체 안내 문구 복사</button>` : ''}</div>
-  ${ls.length ? `<table class="list"><tr><th>번호</th><th>이름</th><th>책</th><th>빌린 날</th><th>반납일</th><th></th></tr>${ls.map(l => `<tr class="${late(l) ? 'late' : ''}"><td>${esc(l.no)}</td><td><b>${esc(l.name)}</b></td><td>${esc(l.title)} <span class="muted">${esc(l.bookId)}</span></td><td>${md(l.out)}</td><td>${md(l.due)} ${late(l) ? '<span class="pill warn">지남</span>' : ''}</td><td style="white-space:nowrap"><button class="sm" onclick="Store.run('extend',{lid:'${esc(l.lid)}',days:OPT().days})&&toast('반납일을 연장했어요')">연장</button> <button class="sm btn" onclick="doReturn('${esc(l.bookId)}')">반납</button></td></tr>`).join('')}</table>` : '<div class="empty">빌려 간 책이 없어요.</div>'}</div>
-  <div class="card"><div class="row" style="justify-content:space-between"><h2>📜 전체 대출 기록</h2><div class="row"><input id="histQ" placeholder="이름·책 제목 검색" value="${esc(UI.histQ)}" oninput="UI.histQ=this.value;render()"><button class="sm" onclick="exportLoans()">⬇️ CSV</button></div></div>
+  return `<div class="card"><div class="row" style="justify-content:space-between"><h2>빌려 간 책 ${ls.length}권 ${lt.length ? `<span class="pill warn">반납일 지남 ${lt.length}권</span>` : ''}</h2>
+  ${lt.length ? `<button class="sm" onclick="copyLate()">연체 안내 문구 복사</button>` : ''}</div>
+  ${ls.length ? `<table class="list"><tr><th>번호</th><th>이름</th><th>책</th><th>빌린 날</th><th>반납일</th><th></th></tr>${ls.map(l => `<tr class="${late(l) ? 'late' : ''}"><td>${esc(l.no)}</td><td><b>${esc(l.name)}</b></td><td>${esc(l.title)} <span class="muted">${esc(l.bookId)}</span></td><td>${md(l.out)}</td><td>${md(l.due)} ${late(l) ? '<span class="pill warn">지남</span>' : ''}</td><td style="white-space:nowrap"><button class="sm" onclick="Store.run('extend',{lid:'${esc(l.lid)}'})&&toast('반납일을 연장했어요')">연장</button> <button class="sm btn" onclick="doReturn('${esc(l.bookId)}')">반납</button></td></tr>`).join('')}</table>` : '<div class="empty">빌려 간 책이 없어요.</div>'}</div>
+  <div class="card"><div class="row" style="justify-content:space-between"><h2>전체 대출 기록</h2><div class="row"><input id="histQ" placeholder="이름·책 제목 검색" value="${esc(UI.histQ)}" oninput="UI.histQ=this.value;render()"><button class="sm" onclick="exportLoans()">CSV 내려받기</button></div></div>
   ${hist.length ? `<table class="list"><tr><th>빌린 날</th><th>번호</th><th>이름</th><th>책</th><th>반납일</th><th>반납한 날</th></tr>${hist.map(l => `<tr><td>${md(l.out)}</td><td>${esc(l.no)}</td><td>${esc(l.name)}</td><td>${esc(l.title)}</td><td>${md(l.due)}</td><td>${l.back ? md(l.back) : '<span class="pill">대출 중</span>'}</td></tr>`).join('')}</table>` : '<div class="empty">기록이 없어요.</div>'}</div>`;
 }
 function copyLate() {
   const lt = openLoans().filter(late);
-  copyText('📚 학급문고 반납 안내\n반납일이 지난 책이 있어요. 내일까지 가져와 주세요!\n' + lt.map(l => `- ${l.no}번 ${l.name}: 『${l.title}』 (반납일 ${md(l.due)})`).join('\n'));
+  copyText('학급문고 반납 안내\n반납일이 지난 책이 있어요. 내일까지 가져와 주세요!\n' + lt.map(l => `- ${l.no}번 ${l.name}: 『${l.title}』 (반납일 ${md(l.due)})`).join('\n'));
 }
 function exportLoans() { downloadCSV('학급문고_대출기록_' + todayStr() + '.csv', [['도서번호', '제목', '번호', '이름', '대출일', '반납예정일', '반납일']].concat(Store.db.loans.map(l => [l.bookId, l.title, l.no, l.name, l.out, l.due, l.back]))); }
 
@@ -367,15 +403,15 @@ function vBooks() {
   const q = UI.bq.trim().toLowerCase();
   const bs = Store.db.books.filter(b => !q || (b.id + b.title + b.author + b.memo).toLowerCase().includes(q));
   const who = id => { const l = openLoans().find(x => x.bookId === id); return l ? l.name : ''; };
-  return `<div class="grid2"><div class="card"><h2>➕ 책 등록 (여러 권 한꺼번에)</h2>
+  return `<div class="grid2"><div class="card"><h2>책 등록</h2>
   <p class="muted" style="margin:0 0 6px">한 줄에 한 권씩 적어요. <b>제목 / 지은이</b> 형식도 돼요.<br>엑셀에서 <b>도서번호·제목·지은이</b> 세 칸을 복사해 붙여 넣어도 돼요. 도서번호를 비우면 B001, B002…로 자동으로 붙여요.</p>
   <textarea id="bookPaste" placeholder="마당을 나온 암탉 / 황선미&#10;어린 왕자 / 생텍쥐페리&#10;책 먹는 여우"></textarea>
   <div class="row" style="justify-content:flex-end;margin-top:8px"><button class="btn" onclick="addBooks()">등록하기</button></div></div>
-  <div class="card"><h2>🏷️ 도서번호 라벨</h2><p class="muted">책 표지 안쪽이나 등에 붙일 라벨을 A4로 인쇄해요(한 장에 40칸). 학생들이 빠른 반납 칸에 번호를 입력하면 돼요.</p>
-  <div class="row"><button onclick="printLabels(false)">🖨️ 전체 라벨 인쇄</button><button onclick="printLabels(true)">🖨️ 검색된 책만 인쇄</button></div>
+  <div class="card"><h2>도서번호 라벨</h2><p class="muted">책 표지 안쪽이나 등에 붙일 라벨을 A4로 인쇄해요(한 장에 40칸). 학생들이 빠른 반납 칸에 번호를 입력하면 돼요.</p>
+  <div class="row"><button onclick="printLabels(false)">전체 라벨 인쇄</button><button onclick="printLabels(true)">검색된 책만 인쇄</button></div>
   <p class="muted" style="margin-top:14px">책 ${Store.db.books.length}권 · 대출 중 ${openLoans().length}권 · 분실/보관 ${Store.db.books.filter(b => b.status === '분실' || b.status === '보관').length}권</p></div></div>
-  <div class="card"><div class="row" style="justify-content:space-between"><h2>📚 책 목록</h2><input id="bq" placeholder="🔍 검색" value="${esc(UI.bq)}" oninput="UI.bq=this.value;render()"></div>
-  ${bs.length ? `<table class="list"><tr><th>도서번호</th><th>제목</th><th>지은이</th><th>상태</th><th>메모</th><th></th></tr>${bs.map(b => `<tr><td>${esc(b.id)}</td><td><b>${esc(b.title)}</b></td><td>${esc(b.author)}</td><td>${b.status === '대출중' ? `<span class="pill">대출 중 · ${esc(who(b.id))}</span>` : b.status === '대출가능' ? '<span class="pill gray">있음</span>' : `<span class="pill warn">${esc(b.status)}</span>`}</td><td class="muted">${esc(b.memo)}</td><td style="white-space:nowrap"><button class="sm" onclick="editBook('${esc(b.id)}')">수정</button></td></tr>`).join('')}</table>` : '<div class="empty">등록된 책이 없어요.</div>'}</div>`;
+  <div class="card"><div class="row" style="justify-content:space-between"><h2>책 목록</h2><input id="bq" placeholder="검색" value="${esc(UI.bq)}" oninput="UI.bq=this.value;render()"></div>
+  ${bs.length ? `<table class="list"><tr><th>도서번호</th><th>제목</th><th>지은이</th><th>상태</th><th>메모</th><th></th></tr>${bs.map(b => `<tr><td>${esc(b.id)}</td><td><b>${esc(b.title)}</b></td><td>${esc(b.author)}</td><td>${b.status === '대출중' ? `<span class="pill acc">${esc(who(b.id))} 대출 중</span>` : b.status === '대출가능' ? '<span class="pill ok">있음</span>' : `<span class="pill warn">${esc(b.status)}</span>`}</td><td class="muted">${esc(b.memo)}</td><td style="white-space:nowrap"><button class="sm" onclick="editBook('${esc(b.id)}')">수정</button></td></tr>`).join('')}</table>` : '<div class="empty">등록된 책이 없어요.</div>'}</div>`;
 }
 function parseLines(txt) { return txt.split(/\r?\n/).map(s => s.trim()).filter(Boolean); }
 function addBooks() {
@@ -384,14 +420,14 @@ function addBooks() {
     const c = line.split(/\s+\/\s+|\s*\/\s*/); return { title: c[0], author: c.slice(1).join(' / ') };
   });
   if (!list.length) return toast('등록할 책을 적어 주세요', true);
-  if (Store.run('addBooks', { list })) toast('📚 ' + list.length + '권 등록했어요');
+  if (Store.run('addBooks', { list })) toast(list.length + '권 등록했어요');
 }
 function editBook(id) {
   const b = Store.db.books.find(x => x.id === id); if (!b) return;
-  modal(`<h3>✏️ 책 정보 수정 <span class="muted">${esc(b.id)}</span></h3>
+  modal(`<h3>책 정보 수정 <span class="muted">${esc(b.id)}</span></h3>
   <label class="f">제목</label><input id="eT" style="width:100%" value="${esc(b.title)}"><label class="f">지은이</label><input id="eA" style="width:100%" value="${esc(b.author)}"><label class="f">메모 (예: 표지 찢어짐)</label><input id="eM" style="width:100%" value="${esc(b.memo)}">
   <label class="f">상태</label><select id="eS" ${b.status === '대출중' ? 'disabled' : ''}>${['대출가능', '보관', '분실'].concat(b.status === '대출중' ? ['대출중'] : []).map(s => `<option ${s === b.status ? 'selected' : ''}>${s}</option>`).join('')}</select> <span class="muted">보관·분실로 두면 학생 화면에 안 보여요.</span>
-  <div class="row" style="justify-content:space-between;margin-top:18px"><button class="danger" id="eD">🗑 삭제</button><div class="row"><button data-close>취소</button><button class="btn" id="eOk">저장</button></div></div>`, m => {
+  <div class="row" style="justify-content:space-between;margin-top:18px"><button class="danger" id="eD">삭제</button><div class="row"><button data-close>취소</button><button class="btn" id="eOk">저장</button></div></div>`, m => {
     m.querySelector('#eOk').onclick = () => { if (Store.run('updateBook', { id, title: m.querySelector('#eT').value, author: m.querySelector('#eA').value, memo: m.querySelector('#eM').value, status: b.status === '대출중' ? undefined : m.querySelector('#eS').value })) { m.remove(); toast('저장했어요'); } };
     m.querySelector('#eD').onclick = () => { if (confirm('『' + b.title + '』을(를) 목록에서 지울까요? (대출 기록은 남아요)') && Store.run('delBook', { id })) { m.remove(); toast('지웠어요'); } };
   });
@@ -407,14 +443,14 @@ function printLabels(onlyFiltered) {
 /* ---------- 학생 ---------- */
 function vStu() {
   const cnt = s => Store.db.loans.filter(l => l.no === s.no && l.name === s.name).length;
-  return `<div class="grid2"><div class="card"><h2>➕ 학생 등록</h2><p class="muted" style="margin:0 0 6px">한 줄에 한 명씩 <b>번호 이름</b>으로 적어요. 엑셀에서 두 칸을 복사해 붙여 넣어도 돼요. 같은 번호가 있으면 이름을 고쳐요.</p>
+  return `<div class="grid2"><div class="card"><h2>학생 등록</h2><p class="muted" style="margin:0 0 6px">한 줄에 한 명씩 <b>번호 이름</b>으로 적어요. 엑셀에서 두 칸을 복사해 붙여 넣어도 돼요. 같은 번호가 있으면 이름을 고쳐요.</p>
   <textarea id="stuPaste" placeholder="1 김하늘&#10;2 이도윤&#10;3 박서연"></textarea><div class="row" style="justify-content:flex-end;margin-top:8px"><button class="btn" onclick="addStu()">등록하기</button></div></div>
-  <div class="card"><h2>👧 학생 명단 (${Store.db.students.length}명)</h2>${Store.db.students.length ? `<table class="list"><tr><th>번호</th><th>이름</th><th>지금까지 빌린 책</th><th></th></tr>${Store.db.students.map(s => `<tr><td>${esc(s.no)}</td><td><b>${esc(s.name)}</b></td><td>${cnt(s)}권</td><td><button class="sm danger" onclick="confirm('${esc(s.name)} 학생을 명단에서 지울까요?')&&Store.run('delStudent',{no:'${esc(s.no)}',name:'${esc(s.name)}'})">지우기</button></td></tr>`).join('')}</table>` : '<div class="empty">아직 학생이 없어요.</div>'}</div></div>`;
+  <div class="card"><h2>학생 명단 (${Store.db.students.length}명)</h2>${Store.db.students.length ? `<table class="list"><tr><th>번호</th><th>이름</th><th>지금까지 빌린 책</th><th></th></tr>${Store.db.students.map(s => `<tr><td>${esc(s.no)}</td><td><b>${esc(s.name)}</b></td><td>${cnt(s)}권</td><td><button class="sm danger" onclick="confirm('${esc(s.name)} 학생을 명단에서 지울까요?')&&Store.run('delStudent',{no:'${esc(s.no)}',name:'${esc(s.name)}'})">지우기</button></td></tr>`).join('')}</table>` : '<div class="empty">아직 학생이 없어요.</div>'}</div></div>`;
 }
 function addStu() {
   const list = parseLines($('#stuPaste').value).map(line => { const c = line.split(/[\t,]+|\s+/).filter(Boolean); return /^\d+$/.test(c[0]) ? { no: c[0], name: c.slice(1).join(' ') } : { no: '', name: c.join(' ') }; }).filter(s => s.name);
   if (!list.length) return toast('학생을 적어 주세요', true);
-  if (Store.run('addStudents', { list })) toast('👧 ' + list.length + '명 등록했어요');
+  if (Store.run('addStudents', { list })) toast(list.length + '명 등록했어요');
 }
 
 /* ---------- 통계 ---------- */
@@ -422,56 +458,59 @@ function vStat() {
   if (!UI.from) { const t = new Date(); UI.from = (t.getMonth() + 1 >= 3 ? t.getFullYear() : t.getFullYear() - 1) + '-03-01'; }
   const ls = Store.db.loans.filter(l => l.out >= UI.from);
   const tally = key => { const m = {}; ls.forEach(l => { const k = key(l); m[k] = (m[k] || 0) + 1; }); return Object.entries(m).sort((a, b) => b[1] - a[1]); };
-  const bars = (arr, lab) => { const mx = arr.length ? arr[0][1] : 1; return arr.length ? `<div class="bars">${arr.slice(0, 15).map(([k, v]) => `<div><span class="n">${esc(lab(k))}</span><i style="width:${Math.max(2, v / mx * 60)}%"></i><b>${v}</b></div>`).join('')}</div>` : '<div class="empty">기록이 없어요.</div>'; };
+  const bars = (arr, lab) => { const mx = arr.length ? arr[0][1] : 1; return arr.length ? `<div class="bars">${arr.slice(0, 15).map(([k, v]) => `<div><span>${esc(lab(k))}</span><span><i style="width:${Math.max(2, v / mx * 100)}%"></i></span><b>${v}</b></div>`).join('')}</div>` : '<div class="empty">기록이 없어요.</div>'; };
   const byStu = Store.db.students.map(s => [stuKey(s), ls.filter(l => l.no === s.no && l.name === s.name).length]).sort((a, b) => b[1] - a[1]);
   const byMonth = tally(l => l.out.slice(0, 7)).sort((a, b) => a[0].localeCompare(b[0]));
-  return `<div class="card row"><b>기간</b><input type="date" value="${UI.from}" onchange="UI.from=this.value;render()"> 부터 오늘까지 · 대출 <b>${ls.length}</b>건 <span class="sp" style="flex:1"></span><button class="sm" onclick="copyReaders()">📋 독서왕 명단 복사</button></div>
-  <div class="grid2"><div class="card"><h2>🏆 많이 읽은 친구</h2>${bars(byStu, k => { const s = findStu(k); return s ? s.no + '번 ' + s.name : k; })}</div>
-  <div class="card"><h2>⭐ 인기 있는 책</h2>${bars(tally(l => l.title), k => k)}</div></div>
-  <div class="card"><h2>📅 월별 대출</h2>${bars(byMonth, k => k.replace('-', '년 ') + '월')}</div>`;
+  return `<div class="card row"><b>기간</b><input type="date" value="${UI.from}" onchange="UI.from=this.value;render()"> 부터 오늘까지 · 대출 <b>${ls.length}</b>건 <span class="sp" style="flex:1"></span><button class="sm" onclick="copyReaders()">독서왕 명단 복사</button></div>
+  <div class="grid2"><div class="card"><h2>많이 읽은 친구</h2>${bars(byStu, k => { const s = findStu(k); return s ? s.no + '번 ' + s.name : k; })}</div>
+  <div class="card"><h2>인기 있는 책</h2>${bars(tally(l => l.title), k => k)}</div></div>
+  <div class="card"><h2>월별 대출</h2>${bars(byMonth, k => k.replace('-', '년 ') + '월')}</div>`;
 }
 function copyReaders() {
   const ls = Store.db.loans.filter(l => l.out >= UI.from);
   const arr = Store.db.students.map(s => [s, ls.filter(l => l.no === s.no && l.name === s.name).length]).filter(x => x[1]).sort((a, b) => b[1] - a[1]);
-  copyText('📚 학급문고 독서 기록 (' + md(UI.from) + '~)\n' + arr.map((x, i) => `${i + 1}. ${x[0].no}번 ${x[0].name} — ${x[1]}권`).join('\n'));
+  copyText('학급문고 독서 기록 (' + md(UI.from) + '~)\n' + arr.map((x, i) => `${i + 1}. ${x[0].no}번 ${x[0].name} — ${x[1]}권`).join('\n'));
 }
 
 /* ---------- 설정 ---------- */
 function vSet() {
   const c = Store.cfg(), o = OPT();
-  return `<div class="grid2"><div class="card"><h2>🔗 구글 시트 연결</h2>
+  return `<div class="grid2"><div class="card"><h2>구글 시트 연결</h2>
   <label class="f">Apps Script 웹 앱 주소 (…/exec 로 끝나요)</label><input id="sUrl" style="width:100%" value="${esc(c.url)}" placeholder="https://script.google.com/macros/s/…/exec">
   <label class="f">연결 비밀번호 (Code.gs 맨 위 PASSWORD와 같게)</label><input id="sPw" type="password" style="width:100%" value="${esc(c.pw)}">
-  <div class="row" style="margin-top:12px"><button class="btn" onclick="saveConn()">저장하고 연결</button>${c.url ? '<button onclick="disconnect()">연결 끊기(체험 모드)</button>' : ''}</div>
-  <p class="muted">이 주소와 비밀번호는 이 기기 브라우저에만 저장돼요. 대출용 태블릿과 선생님 컴퓨터에 각각 한 번씩 넣어 주세요.</p>
-  ${!c.url ? `<p class="muted">체험 모드에서 쓰던 자료를 시트로 옮기려면: 연결한 뒤 <b>도서 관리·학생</b> 탭에 다시 붙여 넣어 주세요.</p>` : ''}</div>
-  <div class="card"><h2>📏 대출 규칙 <span class="muted">(이 기기)</span></h2>
+  <div class="row" style="margin-top:14px"><button class="btn" onclick="saveConn()">저장하고 연결</button>${c.url ? '<button onclick="disconnect()">연결 끊기</button>' : ''}</div></div>
+  <div class="card"><h2>대출 규칙</h2><p class="muted" style="margin:0">${c.url ? '시트에 저장돼서 학생용 화면에도 똑같이 적용돼요.' : '체험 모드에서는 이 기기에만 저장돼요.'}</p>
   <label class="f">대출 기간 (일)</label><input id="oD" type="number" min="1" max="60" value="${o.days}">
-  <label class="f">한 사람이 빌릴 수 있는 권수 (0 = 제한 없음)</label><input id="oM" type="number" min="0" max="20" value="${o.max}">
-  <label class="f">선생님 메뉴 비밀번호 (비우면 잠금 없음)</label><input id="oP" type="password" inputmode="numeric" value="${esc(o.pin)}" autocomplete="new-password">
-  <p class="muted">비밀번호를 넣으면 학생은 <b>대출·반납</b> 화면만 쓸 수 있어요.</p>
-  <div class="row" style="justify-content:flex-end"><button class="btn" onclick="saveOpt()">저장</button></div></div></div>
-  ${!c.url ? `<div class="card"><h2>🧪 체험 자료</h2><button class="danger" onclick="if(confirm('이 기기의 체험 자료를 모두 지우고 예시로 되돌릴까요?')){LS.set(APP_KEY+'-db',null);Store.init()}">체험 자료 초기화</button></div>` : ''}`;
+  <label class="f">한 사람이 빌릴 수 있는 권수 (0이면 제한 없음)</label><input id="oM" type="number" min="0" max="20" value="${o.max}">
+  <div class="row" style="justify-content:flex-end;margin-top:14px"><button class="btn" onclick="saveOpt()">규칙 저장</button></div></div></div>
+  <div class="card"><h2>학생용 화면 열기</h2>
+  ${c.url ? `<p class="muted" style="margin:0 0 10px">아래 주소를 학급 태블릿에서 한 번 열면 시트 연결까지 저절로 돼요. 연결 정보가 들어 있으니 학생들에게 공유하지 말고 태블릿에서만 여세요.</p>
+  <div class="row"><input id="kidUrl" readonly style="flex:1;min-width:240px" value="${esc(kidLink())}"><button class="btn" onclick="copyText($('#kidUrl').value)">주소 복사</button><a class="sm" href="${esc(kidLink())}" target="_blank" rel="noopener"><button>새 탭에서 열기</button></a></div>`
+  : `<p class="muted" style="margin:0 0 10px">구글 시트에 연결하면 학생용 태블릿에 넣을 주소가 여기에 나와요.</p><a href="index.html" target="_blank" rel="noopener"><button>학생용 화면 미리 보기</button></a>`}</div>
+  ${!c.url ? `<div class="card"><h2>체험 자료</h2><button class="danger" onclick="if(confirm('이 기기의 체험 자료를 모두 지우고 예시로 되돌릴까요?')){LS.set(APP_KEY+'-db',null);Store.init()}">체험 자료 초기화</button></div>` : ''}`;
 }
+function kidLink() { const c = Store.cfg(); return new URL('index.html', location.href).href + '#c=' + btoa(unescape(encodeURIComponent(JSON.stringify({ u: c.url, p: c.pw })))); }
 async function saveConn() {
   const url = $('#sUrl').value.trim(), pw = $('#sPw').value;
   if (url && !/^https:\/\/script\.google\.com\/.+\/exec$/.test(url)) return toast('주소는 https://script.google.com/… /exec 형태여야 해요', true);
   Store.setCfg({ url, pw });
-  try { await Store.init(); toast('✅ 구글 시트에 연결했어요'); UI.tab = 'desk'; render(); } catch (e) { toast('연결 실패: ' + e.message, true); }
+  try { await Store.init(); toast('구글 시트에 연결했어요'); render(); } catch (e) { toast('연결 실패: ' + e.message, true); }
 }
 function disconnect() { Store.setCfg({ url: '', pw: '' }); Store.init(); toast('체험 모드로 바꿨어요'); }
-function saveOpt() {
-  const o = { days: Math.max(1, Number($('#oD').value) || 7), max: Math.max(0, Number($('#oM').value) || 0), pin: $('#oP').value.trim() };
-  LS.set(APP_KEY + '-opt', o); if (o.pin) UI.unlocked = true; toast('저장했어요'); render();
-}
+function saveOpt() { if (Store.run('setOpt', { days: $('#oD').value, max: $('#oM').value })) toast('대출 규칙을 저장했어요'); }
 
 /* ---------- 시작 ---------- */
 document.addEventListener('click', e => { const t = e.target.closest('[data-tab]'); if (t) go(t.dataset.tab); });
 document.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.id === 'qret') quickReturn(); });
-$('#lockBtn').onclick = () => { UI.unlocked = false; UI.tab = 'desk'; render(); toast('🔒 잠갔어요'); };
+(function () { // 학생용 주소(#c=…)로 열면 연결 정보 저장
+  const m = /#c=([^&]+)/.exec(location.hash);
+  if (m) { try { const o = JSON.parse(decodeURIComponent(escape(atob(m[1])))); Store.setCfg({ url: o.u, pw: o.p }); } catch (_) {} history.replaceState(null, '', location.pathname); }
+})();
+if (PAGE === 'student') $('#swap').remove(); else { $('#swap').textContent = '학생용 화면 열기'; $('#swap').href = 'index.html'; $('#swap').target = '_blank'; }
+if (PAGE === 'student') { $('#nav').hidden = true; document.title = '학급문고'; } else { document.title = '학급문고 관리'; $('header h1').insertAdjacentHTML('beforeend', '<span class="pill acc" style="font-family:var(--sans)">관리</span>'); }
 Store.onChange = soft => render(soft);
-Store.onSync = (s, m) => { const el = $('#sync'); el.className = 'sync' + (s === 'err' ? ' err' : ''); el.textContent = s === 'local' ? '🧪 체험 모드' : s === 'saving' ? '⏳ 저장 중…' : s === 'ok' ? '✅ 시트와 연결됨' : '⚠️ 연결 문제'; el.title = m || ''; };
-Store.init().catch(() => { UI.tab = 'set'; render(); });
+Store.onSync = (s, m) => { const el = $('#sync'); el.className = 'sync ' + s; el.textContent = s === 'local' ? '체험 모드' : s === 'saving' ? '저장 중' : s === 'ok' ? '구글 시트 연결됨' : '연결 문제'; el.title = m || ''; };
+Store.init().catch(() => { if (PAGE === 'admin') { UI.tab = 'set'; render(); } });
 setInterval(() => { if (!document.querySelector('.modal')) Store.refresh(); }, 30000);
 let idleT; ['click', 'keydown', 'input'].forEach(ev => document.addEventListener(ev, () => { clearTimeout(idleT); idleT = setTimeout(() => { if (UI.tab === 'desk' && UI.who && !document.querySelector('.modal')) { UI.who = null; UI.q = ''; render(); } }, 90000); }));
 </script>
