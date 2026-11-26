@@ -154,6 +154,8 @@ function core(db, req, today) {
     let mx = 0; db.books.forEach(b => { const m = /^B?(\d+)$/i.exec(b.id); if (m) mx = Math.max(mx, Number(m[1])); });
     return 'B' + String(mx + 1).padStart(3, '0');
   };
+  // 시트에 직접 적은 책: 상태가 비었거나 다른 글자면 '대출가능'으로 맞춤
+  db.books.forEach(b => { if (!['대출가능', '대출중', '보관', '분실'].includes(b.status)) { b.status = '대출가능'; dirty.books = 1; } });
   switch (req.action) {
     case 'getAll': break;
     case 'addStudents':
