@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>📮 가정통신문 회신 체크</title>
+<style>
+*{box-sizing:border-box}
+:root{--bg:#f5f3ee;--card:#fff;--ink:#23262e;--mute:#6b7080;--line:#e3e0d8;--pri:#2f6f5e;--pri2:#e4f1ec;--warn:#c2410c;--warn2:#fde8dc;--ok:#15803d;--ok2:#dcfce7;--r:14px}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif;font-size:16px;-webkit-tap-highlight-color:transparent}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:1px solid var(--line);background:var(--card);border-radius:10px;padding:9px 14px}
+button:hover{border-color:#c9c4b8}
+button:disabled{opacity:.45;cursor:default}
+.btn{background:var(--pri);color:#fff;border-color:var(--pri);font-weight:700}
+.btn:hover{filter:brightness(1.08);border-color:var(--pri)}
+.ghost{background:transparent}
+.sm{padding:5px 10px;font-size:14px;border-radius:8px}
+.danger{color:var(--warn)}
+input,select,textarea{border:1px solid var(--line);border-radius:10px;padding:9px 12px;background:#fff;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--pri);outline-offset:0;border-color:var(--pri)}
+textarea{width:100%;min-height:130px;resize:vertical;line-height:1.5}
+header{position:sticky;top:0;z-index:20;background:var(--ink);color:#fff;display:flex;align-items:center;gap:12px;padding:10px 18px;flex-wrap:wrap}
+header h1{font-size:19px;margin:0;font-weight:800;letter-spacing:-.3px}
+header .sp{flex:1}
+.sync{font-size:13px;padding:4px 10px;border-radius:99px;background:#ffffff1f;white-space:nowrap}
+.sync.err{background:#c2410c}
+nav{display:flex;gap:4px;padding:10px 18px 0;flex-wrap:wrap;border-bottom:1px solid var(--line);background:var(--bg);position:sticky;top:52px;z-index:15}
+nav button{border:none;background:transparent;border-radius:10px 10px 0 0;padding:10px 14px;color:var(--mute);font-weight:600}
+nav button[aria-current=true]{background:var(--card);color:var(--ink);box-shadow:0 -1px 0 var(--line) inset,1px 0 0 var(--line),-1px 0 0 var(--line)}
+main{padding:18px;max-width:1280px;margin:0 auto}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;margin-bottom:14px}
+.card h2{font-size:17px;margin:0 0 10px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.muted{color:var(--mute);font-size:14px}
+.pill{display:inline-block;font-size:12.5px;padding:2px 9px;border-radius:99px;background:var(--pri2);color:var(--pri);font-weight:700;white-space:nowrap}
+.pill.warn{background:var(--warn2);color:var(--warn)}
+.pill.gray{background:#eee;color:#666}
+table.list{width:100%;border-collapse:collapse;font-size:15px}
+table.list th,table.list td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
+table.list th{font-size:13px;color:var(--mute);font-weight:600;background:#faf9f6}
+.empty{padding:28px;text-align:center;color:var(--mute)}
+.modal{position:fixed;inset:0;background:#0007;display:flex;align-items:center;justify-content:center;z-index:100;padding:16px}
+.mbox{background:#fff;border-radius:18px;padding:22px;max-width:560px;width:100%;max-height:90vh;overflow:auto;box-shadow:0 20px 60px #0004}
+.mbox h3{margin:0 0 12px;font-size:20px}
+#toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(30px);background:var(--ink);color:#fff;padding:12px 20px;border-radius:12px;opacity:0;transition:.25s;z-index:200;pointer-events:none;font-weight:600;max-width:90vw;text-align:center}
+#toast.show{opacity:1;transform:translateX(-50%)}
+#toast.bad{background:var(--warn)}
+.banner{background:#fff7d6;border:1px solid #f0dc8c;border-radius:12px;padding:10px 14px;margin-bottom:14px;font-size:14.5px}
+label.f{display:block;font-size:14px;color:var(--mute);margin:10px 0 4px;font-weight:600}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:800px){.grid2{grid-template-columns:1fr}nav{top:auto;position:static}}
+
+:root{--pri:#2c5aa0;--pri2:#e6eefb}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{border-radius:99px;padding:7px 14px;font-weight:600;font-size:15px}
+.chip[aria-pressed=true]{background:var(--pri);color:#fff;border-color:var(--pri)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{border:none;border-radius:0;padding:8px 14px}
+.seg button[aria-pressed=true]{background:var(--ink);color:#fff}
+.board{overflow:auto;max-height:calc(100vh - 250px);border:1px solid var(--line);border-radius:12px;background:#fff}
+.board table{border-collapse:separate;border-spacing:0;font-size:15px}
+.board th,.board td{border-bottom:1px solid var(--line);border-right:1px solid #eeebe4;padding:0;text-align:center;white-space:nowrap}
+.board thead th{position:sticky;background:#faf9f6;z-index:2;font-weight:700;padding:7px 10px}
+.board thead tr:first-child th{top:0;height:40px}
+.board thead tr:nth-child(2) th{top:40px;font-size:13.5px;font-weight:600;color:#444}
+.board thead th.nt{background:var(--pri2);color:var(--pri);border-left:3px solid var(--pri)}
+.board th.gs,.board td.gs{border-left:3px solid var(--pri)}
+.board .nm{position:sticky;left:0;background:#fff;z-index:1;text-align:left;padding:0 12px;font-weight:700;min-width:110px}
+.board thead .nm{z-index:3;background:#faf9f6}
+.board tfoot td{position:sticky;bottom:0;background:#faf9f6;font-size:13px;font-weight:700;padding:6px;z-index:1}
+.board tfoot td.nm{z-index:3}
+.cell{border:none;border-radius:0;width:100%;min-width:76px;height:44px;background:transparent;font-size:15px;font-weight:700;padding:0 6px}
+.cell:hover{background:#f4f1ea}
+.cell.y{background:var(--ok2);color:var(--ok)}
+.cell.c1{background:var(--ok2);color:var(--ok)}
+.cell.c2{background:var(--warn2);color:var(--warn)}
+.cell.c3{background:#ede4fb;color:#6b3fb5}
+.na{color:#ccc;font-size:13px}
+.left{font-size:13px;color:var(--warn);font-weight:700;padding:0 10px}
+.allbtn{display:block;margin:3px auto 0;font-size:11.5px;padding:1px 7px;border-radius:6px}
+.stu-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
+.stu{position:relative;padding:16px 8px;border-radius:16px;font-size:19px;font-weight:800;background:#fff;border:2px solid var(--line)}
+.stu small{display:block;font-size:12.5px;color:var(--mute);font-weight:600}
+.stu.done{background:var(--ok2);border-color:#a7e3bd}
+.stu .badge{position:absolute;top:6px;right:8px;font-size:12px;background:var(--warn);color:#fff;border-radius:99px;padding:1px 8px}
+.stu.done .badge{background:var(--ok)}
+.pnote{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px}
+.pnote h4{margin:0 0 8px;font-size:16px}
+.pit{display:flex;align-items:center;gap:10px;margin:8px 0;flex-wrap:wrap}
+.pit .lb{min-width:120px;font-weight:600}
+.tog{font-size:16px;padding:10px 16px;border-radius:10px;min-width:96px}
+.tog[aria-pressed=true]{background:var(--ok);border-color:var(--ok);color:#fff;font-weight:700}
+.tog.o2[aria-pressed=true]{background:var(--warn);border-color:var(--warn)}
+.tog.o3[aria-pressed=true]{background:#6b3fb5;border-color:#6b3fb5}
+.prog{height:10px;background:#eee;border-radius:99px;overflow:hidden;margin:6px 0 4px}
+.prog i{display:block;height:100%;background:var(--ok)}
+.miss{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.miss span{background:var(--warn2);color:var(--warn);border-radius:8px;padding:3px 9px;font-size:14px;font-weight:600}
+.itrow{display:grid;grid-template-columns:1fr 130px 1fr auto;gap:6px;margin-bottom:6px;align-items:center}
+@media(max-width:640px){.itrow{grid-template-columns:1fr 1fr}}
+.pop{position:fixed;z-index:120;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 10px 30px #0003;padding:6px;display:flex;flex-direction:column;gap:4px;min-width:130px}
+.pop button{text-align:left;font-weight:600}
+</style>
+</head>
+<body>
+<header>
+  <h1>📮 가정통신문 회신 체크</h1>
+  <span class="sp"></span>
+  <select id="clsSel" style="color:#222" hidden></select>
+  <span class="sync" id="sync">…</span>
+</header>
+<nav id="nav"></nav>
+<main id="main"></main>
+<script>
+const APP_NAME = '가정통신문 회신 체크';
+const SCHEMA = {
+  students: [['cls', '학급'], ['no', '번호'], ['name', '이름']],
+  notices: [['nid', '통신문ID'], ['title', '제목'], ['due', '회신마감'], ['target', '대상학급'], ['state', '상태'], ['made', '등록일']],
+  items: [['iid', '항목ID'], ['nid', '통신문ID'], ['label', '항목'], ['type', '유형'], ['opts', '선택지'], ['ord', '순서']],
+  resps: [['iid', '항목ID'], ['cls', '학급'], ['no', '번호'], ['name', '이름'], ['val', '응답'], ['at', '기록일']]
+};
+const SHEETNAMES = { students: '학생', notices: '통신문', items: '회신항목', resps: '회신기록' };
+const MERGE_ACTIONS = ['setResps'];
+
+/* 회신 규칙 — 화면(체험 모드)과 구글 시트(Apps Script)가 같은 코드를 씁니다
+   유형: check = 냈는지만 체크 / choice = 선택지 중 하나(동의·비동의, 참가·불참 등) */
+function core(db, req, today) {
+  const p = req.data || {}, dirty = {};
+  const fail = m => { throw new Error(m); };
+  const S = v => String(v == null ? '' : v).trim();
+  const uid = pre => pre + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  switch (req.action) {
+    case 'getAll': break;
+    case 'addStudents':
+      (p.list || []).forEach(s => {
+        const cls = S(s.cls), no = S(s.no), name = S(s.name); if (!name || !no) return;
+        const ex = db.students.find(x => x.cls === cls && x.no === no);
+        if (ex) ex.name = name; else db.students.push({ cls, no, name });
+      });
+      db.students.sort((a, b) => a.cls.localeCompare(b.cls, 'ko', { numeric: true }) || (Number(a.no) - Number(b.no)));
+      dirty.students = 1; break;
+    case 'delStudent':
+      db.students = db.students.filter(s => !(s.cls === S(p.cls) && s.no === S(p.no)));
+      dirty.students = 1; break;
+    case 'saveNotice': {
+      const title = S(p.title); if (!title) fail('통신문 제목을 입력해 주세요.');
+      const items = (p.items || []).filter(i => S(i.label));
+      if (!items.length) fail('회신 항목을 하나 이상 넣어 주세요.');
+      items.forEach(i => { if (i.type === 'choice' && S(i.opts).split(',').map(S).filter(Boolean).length < 2) fail('「' + S(i.label) + '」 선택지를 두 개 이상 쉼표로 적어 주세요.'); });
+      let n = p.nid && db.notices.find(x => x.nid === S(p.nid));
+      if (!n) { n = { nid: uid('N'), state: '진행', made: today }; db.notices.push(n); }
+      n.title = title; n.due = S(p.due); n.target = S(p.target);
+      const keep = {};
+      items.forEach((it, k) => {
+        let iid = S(it.iid), ex = iid && db.items.find(x => x.iid === iid && x.nid === n.nid);
+        if (!ex) { iid = uid('I'); ex = { iid, nid: n.nid }; db.items.push(ex); }
+        ex.label = S(it.label); ex.type = it.type === 'choice' ? 'choice' : 'check';
+        ex.opts = ex.type === 'choice' ? S(it.opts).split(',').map(S).filter(Boolean).join(',') : '';
+        ex.ord = String(k + 1); keep[iid] = 1;
+      });
+      const gone = db.items.filter(x => x.nid === n.nid && !keep[x.iid]).map(x => x.iid);
+      db.items = db.items.filter(x => !gone.includes(x.iid));
+      db.resps = db.resps.filter(r => !gone.includes(r.iid));
+      dirty.notices = dirty.items = dirty.resps = 1; break;
+    }
+    case 'setState': {
+      const n = db.notices.find(x => x.nid === S(p.nid)) || fail('통신문을 찾지 못했어요.');
+      n.state = p.state === '완료' ? '완료' : '진행'; dirty.notices = 1; break;
+    }
+    case 'delNotice': {
+      const ids = db.items.filter(x => x.nid === S(p.nid)).map(x => x.iid);
+      db.notices = db.notices.filter(x => x.nid !== S(p.nid));
+      db.items = db.items.filter(x => x.nid !== S(p.nid));
+      db.resps = db.resps.filter(r => !ids.includes(r.iid));
+      dirty.notices = dirty.items = dirty.resps = 1; break;
+    }
+    case 'setResps':
+      (p.list || []).forEach(r => {
+        const iid = S(r.iid), cls = S(r.cls), no = S(r.no), val = S(r.val);
+        const it = db.items.find(x => x.iid === iid); if (!it) return; // 지워진 항목은 건너뜀
+        const i = db.resps.findIndex(x => x.iid === iid && x.cls === cls && x.no === no);
+        if (!val) { if (i >= 0) db.resps.splice(i, 1); return; }
+        if (it.type === 'choice' && !it.opts.split(',').includes(val)) return;
+        if (i >= 0) { db.resps[i].val = val; db.resps[i].name = S(r.name); db.resps[i].at = today; }
+        else db.resps.push({ iid, cls, no, name: S(r.name), val, at: today });
+      });
+      dirty.resps = 1; break;
+    default: fail('알 수 없는 요청: ' + req.action);
+  }
+  return { dirty: Object.keys(dirty) };
+}
+
+/* ===== 저장소: 구글 시트(GAS) 또는 이 기기(체험 모드) ===== */
+const LS = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (_) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (_) {} }
+};
+function todayStr() { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+function clone(o) { return JSON.parse(JSON.stringify(o)); }
+function emptyDb() { const d = {}; Object.keys(SCHEMA).forEach(k => d[k] = []); return d; }
+
+const Store = {
+  db: emptyDb(), q: [], busy: false, onChange: () => {}, onSync: () => {},
+  cfg() { return LS.get(APP_KEY + '-cfg', { url: '', pw: '' }); },
+  setCfg(c) { LS.set(APP_KEY + '-cfg', c); },
+  remote() { return !!this.cfg().url; },
+  async send(req) {
+    const c = this.cfg();
+    const res = await fetch(c.url, { method: 'POST', body: JSON.stringify(Object.assign({}, req, { pw: c.pw })) });
+    let j; try { j = await res.json(); } catch (_) { throw new Error('응답을 읽지 못했어요. 배포 주소(/exec)와 액세스 권한(모든 사용자)을 확인해 주세요.'); }
+    if (!j.ok) throw new Error(j.err || '알 수 없는 오류');
+    return j;
+  },
+  async init() {
+    if (!this.remote()) { this.db = Object.assign(emptyDb(), LS.get(APP_KEY + '-db', null) || (typeof DEMO !== 'undefined' ? DEMO() : {})); this.saveLocal(); this.onChange(); this.onSync('local'); return; }
+    this.onSync('saving');
+    try { this.db = Object.assign(emptyDb(), (await this.send({ action: 'getAll' })).db); this.onSync('ok'); }
+    catch (e) { this.onSync('err', e.message); throw e; }
+    this.onChange();
+  },
+  saveLocal() { LS.set(APP_KEY + '-db', this.db); },
+  /* 화면에 먼저 반영하고(바로 보임), 시트에는 순서대로 저장 */
+  run(action, data) {
+    const req = { action, data };
+    const backup = clone(this.db);
+    try { core(this.db, clone(req), todayStr()); }
+    catch (e) { this.db = backup; toast('⚠️ ' + e.message, true); return false; }
+    this.onChange();
+    if (!this.remote()) { this.saveLocal(); return true; }
+    this.q.push(req); this.pump(); return true;
+  },
+  async pump() {
+    if (this.busy) return; this.busy = true; this.onSync('saving');
+    while (this.q.length) {
+      let req = this.q[0], n = 1;
+      if (MERGE_ACTIONS.includes(req.action)) { // 연속 체크는 한 번에 모아서 저장
+        while (n < this.q.length && this.q[n].action === req.action) n++;
+        const list = [].concat(...this.q.slice(0, n).map(r => r.data.list));
+        req = { action: req.action, data: { list } };
+      }
+      try {
+        const r = await this.send(req);
+        this.q.splice(0, n);
+        if (!this.q.length) { this.db = Object.assign(emptyDb(), r.db); this.onChange(); }
+      } catch (e) {
+        this.q.length = 0; toast('⚠️ 저장 실패: ' + e.message, true);
+        try { this.db = Object.assign(emptyDb(), (await this.send({ action: 'getAll' })).db); } catch (_) {}
+        this.onChange(); this.busy = false; this.onSync('err', e.message); return;
+      }
+    }
+    this.busy = false; this.onSync('ok');
+  },
+  async refresh() {
+    if (!this.remote() || this.busy || this.q.length) return;
+    try { const r = await this.send({ action: 'getAll' }); if (!this.busy && !this.q.length) { this.db = Object.assign(emptyDb(), r.db); this.onChange(true); this.onSync('ok'); } } catch (_) {}
+  }
+};
+
+let toastT;
+function toast(msg, bad) {
+  let t = document.getElementById('toast');
+  if (!t) { t = document.createElement('div'); t.id = 'toast'; document.body.appendChild(t); }
+  t.textContent = msg; t.className = 'show' + (bad ? ' bad' : '');
+  clearTimeout(toastT); toastT = setTimeout(() => t.className = '', bad ? 4500 : 2200);
+}
+function modal(html, onMount) {
+  const m = document.createElement('div'); m.className = 'modal';
+  m.innerHTML = '<div class="mbox">' + html + '</div>';
+  m.addEventListener('click', e => { if (e.target === m || e.target.closest('[data-close]')) m.remove(); });
+  document.body.appendChild(m); if (onMount) onMount(m); return m;
+}
+function copyText(txt) {
+  const done = () => toast('📋 복사했어요');
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done, () => fallback());
+  else fallback();
+  function fallback() { const ta = document.createElement('textarea'); ta.value = txt; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); done(); } catch (_) { toast('복사하지 못했어요', true); } ta.remove(); }
+}
+function downloadCSV(name, rows) {
+  const csv = '﻿' + rows.map(r => r.map(v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"').join(',')).join('\r\n');
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' })); a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+}
+
+const APP_KEY = 'replycheck';
+function DEMO() {
+  const names = ['김하늘', '이도윤', '박서연', '최지호', '정하린', '강민준', '윤서아', '임준우'];
+  const d = n => { const t = new Date(); t.setDate(t.getDate() + n); return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0'); };
+  return {
+    students: names.map((n, i) => ({ cls: '4-1', no: String(i + 1), name: n })),
+    notices: [
+      { nid: 'Ndemo1', title: '겨울 현장체험학습 참가 동의서', due: d(3), target: '', state: '진행', made: todayStr() },
+      { nid: 'Ndemo2', title: '방과후학교 수강 신청서', due: d(5), target: '', state: '진행', made: todayStr() }
+    ],
+    items: [
+      { iid: 'Idemo1', nid: 'Ndemo1', label: '참가 여부', type: 'choice', opts: '참가,불참', ord: '1' },
+      { iid: 'Idemo2', nid: 'Ndemo1', label: '사진 촬영 동의', type: 'choice', opts: '동의,비동의', ord: '2' },
+      { iid: 'Idemo3', nid: 'Ndemo1', label: '건강 조사서', type: 'check', opts: '', ord: '3' },
+      { iid: 'Idemo4', nid: 'Ndemo2', label: '신청서 제출', type: 'check', opts: '', ord: '1' }
+    ],
+    resps: [{ iid: 'Idemo1', cls: '4-1', no: '1', name: '김하늘', val: '참가', at: todayStr() }, { iid: 'Idemo4', cls: '4-1', no: '2', name: '이도윤', val: '제출', at: todayStr() }]
+  };
+}
+const TABS = [['check', '✅ 회신 체크'], ['miss', '📊 미제출 현황'], ['notice', '📝 통신문'], ['stu', '👧 학생'], ['set', '⚙️ 설정']];
+const UI = { tab: 'check', mode: LS.get(APP_KEY + '-mode', 'table'), sel: null, cls: LS.get(APP_KEY + '-cls', ''), showDone: false };
+const $ = s => document.querySelector(s);
+const DB = () => Store.db;
+const W = ['일', '월', '화', '수', '목', '금', '토'];
+function md(ds) { if (!ds) return ''; const p = ds.split('-').map(Number), d = new Date(p[0], p[1] - 1, p[2]); return p[1] + '/' + p[2] + '(' + W[d.getDay()] + ')'; }
+function dday(ds) {
+  if (!ds) return '';
+  const p = ds.split('-').map(Number), t = new Date(); t.setHours(0, 0, 0, 0);
+  const n = Math.round((new Date(p[0], p[1] - 1, p[2]) - t) / 864e5);
+  return n > 0 ? `<span class="pill">D-${n}</span>` : n === 0 ? '<span class="pill warn">오늘 마감</span>' : '<span class="pill warn">마감 지남</span>';
+}
+const classes = () => [...new Set(DB().students.map(s => s.cls))].sort((a, b) => a.localeCompare(b, 'ko', { numeric: true }));
+const active = () => DB().notices.filter(n => n.state !== '완료').sort((a, b) => (a.due || '9').localeCompare(b.due || '9'));
+const itemsOf = nid => DB().items.filter(i => i.nid === nid).sort((a, b) => Number(a.ord) - Number(b.ord));
+const targetsOf = n => { const t = n.target ? n.target.split(',') : null; return DB().students.filter(s => (!t || t.includes(s.cls)) && (!UI.cls || s.cls === UI.cls)); };
+const isTarget = (n, s) => !n.target || n.target.split(',').includes(s.cls);
+let RMAP = {};
+function buildMap() { RMAP = {}; DB().resps.forEach(r => RMAP[r.iid + '|' + r.cls + '|' + r.no] = r.val); }
+const val = (it, s) => RMAP[it.iid + '|' + s.cls + '|' + s.no] || '';
+const optClass = (it, v) => { if (!v) return ''; if (it.type === 'check') return 'y'; const i = it.opts.split(',').indexOf(v); return 'c' + Math.min(3, i + 1); };
+const selNotices = () => { const a = active(); if (!UI.sel) return a; return a.filter(n => UI.sel.includes(n.nid)); };
+const sname = s => (classes().length > 1 ? s.cls + ' ' : '') + s.no + '번 ' + s.name;
+function setR(it, s, v) { Store.run('setResps', { list: [{ iid: it.iid, cls: s.cls, no: s.no, name: s.name, val: v }] }); }
+
+function go(tab) { UI.tab = tab; closePop(); render(); }
+function render(soft) {
+  buildMap();
+  $('#nav').innerHTML = TABS.map(t => `<button data-tab="${t[0]}" aria-current="${UI.tab === t[0]}">${t[1]}</button>`).join('');
+  const cs = classes(), sel = $('#clsSel');
+  sel.hidden = cs.length < 2;
+  if (UI.cls && !cs.includes(UI.cls)) UI.cls = '';
+  sel.innerHTML = '<option value="">전체 학급</option>' + cs.map(c => `<option ${c === UI.cls ? 'selected' : ''}>${esc(c)}</option>`).join('');
+  if (soft && (document.querySelector('.pop') || (document.activeElement && /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)))) return;
+  const sc = $('.board') && $('.board').scrollTop, sl = $('.board') && $('.board').scrollLeft;
+  const f = { check: vCheck, miss: vMiss, notice: vNotice, stu: vStu, set: vSet }[UI.tab];
+  $('#main').innerHTML = (Store.remote() ? '' : `<div class="banner">🧪 <b>체험 모드</b> — 예시 자료가 들어 있고, 이 기기에만 저장돼요. 구글 시트에 연결하려면 <a href="#" onclick="go('set');return false">⚙️ 설정</a>에서 주소를 넣어 주세요.</div>`) + f();
+  const b = $('.board'); if (b && sc != null) { b.scrollTop = sc; b.scrollLeft = sl; }
+  const pm = document.querySelector('.modal[data-stu]'); if (pm) drawStuPanel(pm);
+}
+
+/* ---------- 회신 체크 ---------- */
+function vCheck() {
+  const a = active();
+  if (!DB().students.length) return `<div class="card empty">학생 명단이 없어요. <b>👧 학생</b> 탭에서 먼저 등록해 주세요.</div>`;
+  if (!a.length) return `<div class="card empty">받고 있는 통신문이 없어요.<br><br><button class="btn" onclick="editNotice()">➕ 새 통신문 등록</button></div>`;
+  const ns = selNotices();
+  const top = `<div class="card"><div class="row" style="justify-content:space-between;margin-bottom:10px"><b>오늘 받을 통신문 고르기 <span class="muted">(여러 개 함께 체크할 수 있어요)</span></b>
+  <div class="seg"><button aria-pressed="${UI.mode === 'table'}" onclick="setMode('table')">📋 표로 체크</button><button aria-pressed="${UI.mode === 'stu'}" onclick="setMode('stu')">🙋 학생별 체크</button></div></div>
+  <div class="chips">${a.map(n => `<button class="chip" aria-pressed="${ns.includes(n)}" onclick="toggleSel('${n.nid}')">${esc(n.title)} ${dday(n.due)}</button>`).join('')}${a.length > 1 ? `<button class="chip ghost" onclick="UI.sel=null;render()">모두 선택</button>` : ''}</div></div>`;
+  if (!ns.length) return top + '<div class="card empty">위에서 통신문을 하나 이상 골라 주세요.</div>';
+  return top + (UI.mode === 'stu' ? vStuMode(ns) : vTable(ns));
+}
+function setMode(m) { UI.mode = m; LS.set(APP_KEY + '-mode', m); render(); }
+function toggleSel(nid) { const cur = selNotices().map(n => n.nid); UI.sel = cur.includes(nid) ? cur.filter(x => x !== nid) : cur.concat(nid); render(); }
+function studentsFor(ns) { const set = new Set(); ns.forEach(n => targetsOf(n).forEach(s => set.add(s))); return DB().students.filter(s => set.has(s)); }
+function pendingOf(s, ns) { let k = 0; ns.forEach(n => { if (isTarget(n, s)) itemsOf(n.nid).forEach(it => { if (!val(it, s)) k++; }); }); return k; }
+
+function vTable(ns) {
+  const stus = studentsFor(ns), cols = [];
+  ns.forEach(n => itemsOf(n.nid).forEach((it, k) => cols.push({ n, it, first: k === 0 })));
+  const h1 = ns.map(n => `<th class="nt" colspan="${itemsOf(n.nid).length}">${esc(n.title)} ${dday(n.due)}</th>`).join('');
+  const h2 = cols.map(c => `<th class="${c.first ? 'gs' : ''}">${esc(c.it.label)}${c.it.type === 'check' ? `<button class="sm allbtn" onclick="allCheck('${c.it.iid}')">모두 ✓</button>` : `<div class="muted" style="font-size:11.5px;font-weight:500">${esc(c.it.opts.replace(/,/g, ' / '))}</div>`}</th>`).join('');
+  const body = stus.map((s, ri) => `<tr><td class="nm">${esc(sname(s))}</td>${cols.map((c, ci) => {
+    if (!isTarget(c.n, s)) return `<td class="${c.first ? 'gs' : ''}"><span class="na">—</span></td>`;
+    const v = val(c.it, s);
+    return `<td class="${c.first ? 'gs' : ''}"><button class="cell ${optClass(c.it, v)}" data-r="${ri}" data-c="${ci}">${v ? (c.it.type === 'check' ? '✓' : esc(v)) : ''}</button></td>`;
+  }).join('')}<td class="left">${(p => p ? '남음 ' + p : '✅')(pendingOf(s, ns))}</td></tr>`).join('');
+  const foot = cols.map(c => { const t = targetsOf(c.n), d = t.filter(s => val(c.it, s)).length; return `<td class="${c.first ? 'gs' : ''}" style="color:${d === t.length ? 'var(--ok)' : 'var(--warn)'}">${d}/${t.length}</td>`; }).join('');
+  window._T = { stus, cols };
+  return `<div class="board"><table><thead><tr><th class="nm" rowspan="2">학생</th>${h1}<th rowspan="2"></th></tr><tr>${h2}</tr></thead><tbody>${body}</tbody><tfoot><tr><td class="nm">제출</td>${foot}<td></td></tr></tfoot></table></div>
+  <p class="muted">칸을 누르면 체크돼요. 선택형 항목은 누르면 고를 수 있는 메뉴가 나와요. 잘못 눌렀으면 한 번 더 누르면 지워져요.</p>`;
+}
+function allCheck(iid) {
+  const it = DB().items.find(i => i.iid === iid), n = it && DB().notices.find(x => x.nid === it.nid); if (!n) return;
+  const list = targetsOf(n).filter(s => !val(it, s)).map(s => ({ iid, cls: s.cls, no: s.no, name: s.name, val: '제출' }));
+  if (!list.length) return toast('이미 모두 체크돼 있어요');
+  if (confirm(`「${it.label}」을(를) 아직 안 낸 ${list.length}명 모두 제출로 체크할까요?`)) Store.run('setResps', { list });
+}
+function closePop() { document.querySelectorAll('.pop').forEach(p => p.remove()); }
+document.addEventListener('click', e => {
+  const cell = e.target.closest('.cell');
+  if (!cell) { if (!e.target.closest('.pop')) closePop(); return; }
+  closePop();
+  const s = window._T.stus[+cell.dataset.r], c = window._T.cols[+cell.dataset.c], v = val(c.it, s);
+  if (c.it.type === 'check') return setR(c.it, s, v ? '' : '제출');
+  const r = cell.getBoundingClientRect(), pop = document.createElement('div'); pop.className = 'pop';
+  pop.innerHTML = `<div class="muted" style="padding:2px 6px">${esc(s.name)} · ${esc(c.it.label)}</div>` + c.it.opts.split(',').map((o, i) => `<button class="tog o${i + 1}" aria-pressed="${v === o}" data-v="${esc(o)}">${esc(o)}</button>`).join('') + `<button class="sm" data-v="">지우기 (미제출)</button>`;
+  pop.style.left = Math.min(r.left, innerWidth - 150) + 'px'; pop.style.top = Math.min(r.bottom + 4, innerHeight - 220) + 'px';
+  pop.onclick = ev => { const b = ev.target.closest('[data-v]'); if (!b) return; closePop(); setR(c.it, s, b.dataset.v); };
+  document.body.appendChild(pop);
+});
+
+function vStuMode(ns) {
+  const stus = studentsFor(ns);
+  return `<div class="card"><h2>통신문을 낸 학생 이름을 눌러요 👇 <span class="muted">한 번에 여러 장을 받아도 그 학생 화면에서 한꺼번에 체크해요</span></h2>
+  <div class="stu-grid">${stus.map((s, i) => { const p = pendingOf(s, ns); return `<button class="stu${p ? '' : ' done'}" onclick="openStu(${i})"><small>${esc(classes().length > 1 ? s.cls + ' · ' : '')}${esc(s.no)}번</small>${esc(s.name)}<span class="badge">${p ? '남음 ' + p : '완료'}</span></button>`; }).join('')}</div></div>`;
+}
+function openStu(i) {
+  const m = modal('<div id="sp"></div>'); m.dataset.stu = i; m.querySelector('.mbox').style.maxWidth = '640px'; drawStuPanel(m);
+}
+function drawStuPanel(m) {
+  const ns = selNotices(), stus = studentsFor(ns), i = +m.dataset.stu, s = stus[i];
+  if (!s) return m.remove();
+  const box = m.querySelector('#sp');
+  box.innerHTML = `<div class="row" style="justify-content:space-between"><h3 style="margin:0">${esc(sname(s))}</h3><span class="pill${pendingOf(s, ns) ? ' warn' : ''}">${pendingOf(s, ns) ? '남은 항목 ' + pendingOf(s, ns) : '모두 받았어요 ✅'}</span></div>
+  ${ns.filter(n => isTarget(n, s)).map(n => `<div class="pnote" style="margin-top:12px"><h4>📄 ${esc(n.title)} ${dday(n.due)}</h4>${itemsOf(n.nid).map(it => { const v = val(it, s);
+    return `<div class="pit"><span class="lb">${esc(it.label)}</span>${it.type === 'check' ? `<button class="tog" aria-pressed="${!!v}" data-i="${it.iid}" data-v="${v ? '' : '제출'}">${v ? '✓ 받음' : '받기'}</button>` : it.opts.split(',').map((o, k) => `<button class="tog o${k + 1}" aria-pressed="${v === o}" data-i="${it.iid}" data-v="${v === o ? '' : esc(o)}">${esc(o)}</button>`).join('')}</div>`; }).join('')}</div>`).join('')}
+  <div class="row" style="justify-content:space-between;margin-top:14px"><button onclick="this.closest('.modal').dataset.stu=${Math.max(0, i - 1)};drawStuPanel(this.closest('.modal'))" ${i ? '' : 'disabled'}>◀ 이전</button>
+  <div class="row"><button class="btn" id="allIn">✅ 체크 항목 모두 받음</button><button data-close>닫기</button><button onclick="this.closest('.modal').dataset.stu=${i + 1};drawStuPanel(this.closest('.modal'))" ${i < stus.length - 1 ? '' : 'disabled'}>다음 학생 ▶</button></div></div>`;
+  box.querySelectorAll('[data-i]').forEach(b => b.onclick = () => { const it = DB().items.find(x => x.iid === b.dataset.i); setR(it, s, b.dataset.v); });
+  box.querySelector('#allIn').onclick = () => {
+    const list = []; ns.filter(n => isTarget(n, s)).forEach(n => itemsOf(n.nid).forEach(it => { if (it.type === 'check' && !val(it, s)) list.push({ iid: it.iid, cls: s.cls, no: s.no, name: s.name, val: '제출' }); }));
+    if (list.length) Store.run('setResps', { list }); else toast('체크할 항목이 없어요');
+  };
+}
+
+/* ---------- 미제출 현황 ---------- */
+function missingData(n) {
+  const t = targetsOf(n), its = itemsOf(n.nid);
+  return { t, its, done: t.filter(s => its.every(it => val(it, s))), per: its.map(it => ({ it, miss: t.filter(s => !val(it, s)), tally: it.type === 'choice' ? it.opts.split(',').map(o => [o, t.filter(s => val(it, s) === o).length]) : null })) };
+}
+function vMiss() {
+  const a = active();
+  if (!a.length) return '<div class="card empty">받고 있는 통신문이 없어요.</div>';
+  const byStu = DB().students.filter(s => !UI.cls || s.cls === UI.cls).map(s => [s, a.filter(n => isTarget(n, s) && itemsOf(n.nid).some(it => !val(it, s)))]).filter(x => x[1].length);
+  return `<div class="card"><div class="row" style="justify-content:space-between"><h2>🙋 학생별로 아직 안 낸 것 (${byStu.length}명)</h2><button class="sm btn" onclick="copyByStu()">📋 알림장용 문구 복사</button></div>
+  ${byStu.length ? `<table class="list">${byStu.map(([s, ns]) => `<tr><td style="width:150px"><b>${esc(sname(s))}</b></td><td>${ns.map(n => `<span class="pill warn" style="margin:2px">${esc(n.title)}${(m => m.length < itemsOf(n.nid).length ? ' (' + m.map(it => esc(it.label)).join(', ') + ')' : '')(itemsOf(n.nid).filter(it => !val(it, s)))}</span>`).join(' ')}</td></tr>`).join('')}</table>` : '<div class="empty">🎉 모두 냈어요!</div>'}</div>
+  ${a.map(n => { const d = missingData(n), pct = d.t.length ? Math.round(d.done.length / d.t.length * 100) : 0;
+    return `<div class="card"><div class="row" style="justify-content:space-between"><h2 style="margin:0">📄 ${esc(n.title)} ${dday(n.due)} <span class="muted" style="font-weight:500">${n.due ? md(n.due) + ' 마감' : ''}</span></h2><div class="row"><button class="sm" onclick="copyNotice('${n.nid}')">📋 미제출 명단 복사</button><button class="sm" onclick="csvNotice('${n.nid}')">⬇️ CSV</button></div></div>
+    <div class="prog"><i style="width:${pct}%"></i></div><div class="muted">모든 항목을 다 낸 학생 <b>${d.done.length}</b> / ${d.t.length}명 (${pct}%)</div>
+    ${d.per.map(p => `<div style="margin-top:12px"><b>${esc(p.it.label)}</b> <span class="muted">${d.t.length - p.miss.length}/${d.t.length}</span> ${p.tally ? p.tally.map(([o, k], i) => `<span class="pill" style="${i ? 'background:var(--warn2);color:var(--warn)' : ''}">${esc(o)} ${k}</span>`).join(' ') : ''}
+    ${p.miss.length ? `<div class="miss">${p.miss.map(s => `<span>${esc(sname(s))}</span>`).join('')}</div>` : ' <span class="pill">모두 냄 ✅</span>'}</div>`).join('')}</div>`; }).join('')}`;
+}
+function copyByStu() {
+  const a = active();
+  const lines = DB().students.filter(s => !UI.cls || s.cls === UI.cls).map(s => [s, a.filter(n => isTarget(n, s) && itemsOf(n.nid).some(it => !val(it, s)))]).filter(x => x[1].length)
+    .map(([s, ns]) => `- ${sname(s)}: ${ns.map(n => n.title).join(', ')}`);
+  copyText(lines.length ? '📮 가정통신문 회신을 아직 내지 않은 친구들이에요. 내일까지 꼭 가져와 주세요!\n' + lines.join('\n') : '모두 냈어요!');
+}
+function copyNotice(nid) {
+  const n = DB().notices.find(x => x.nid === nid), d = missingData(n);
+  const miss = d.t.filter(s => !d.done.includes(s)).map(s => { const m = d.its.filter(it => !val(it, s)); return `- ${sname(s)}${m.length < d.its.length ? ' (' + m.map(it => it.label).join(', ') + ')' : ''}`; });
+  copyText(`📄 「${n.title}」${n.due ? ' (' + md(n.due) + ' 마감)' : ''} 회신 미제출\n` + (miss.length ? miss.join('\n') : '모두 냈어요!'));
+}
+function csvNotice(nid) {
+  const n = DB().notices.find(x => x.nid === nid), its = itemsOf(nid), t = DB().students.filter(s => isTarget(n, s));
+  downloadCSV(n.title.replace(/[\\/:*?"<>|]/g, '') + '_회신결과.csv', [['학급', '번호', '이름'].concat(its.map(i => i.label))].concat(t.map(s => [s.cls, s.no, s.name].concat(its.map(it => val(it, s))))));
+}
+
+/* ---------- 통신문 관리 ---------- */
+function vNotice() {
+  const all = DB().notices.slice().sort((a, b) => (b.made || '').localeCompare(a.made || '')), list = all.filter(n => UI.showDone || n.state !== '완료');
+  const nDone = all.filter(n => n.state === '완료').length;
+  return `<div class="card"><div class="row" style="justify-content:space-between"><button class="btn" onclick="editNotice()">➕ 새 통신문 등록</button>
+  ${nDone ? `<label class="row muted"><input type="checkbox" ${UI.showDone ? 'checked' : ''} onchange="UI.showDone=this.checked;render()"> 완료된 통신문도 보기 (${nDone})</label>` : ''}</div></div>
+  ${list.length ? list.map(n => { const d = missingData(n);
+    return `<div class="card"><div class="row" style="justify-content:space-between"><div><h2 style="margin:0 0 4px">${esc(n.title)} ${n.state === '완료' ? '<span class="pill gray">완료</span>' : dday(n.due)}</h2>
+    <div class="muted">${n.due ? md(n.due) + ' 마감 · ' : ''}대상 ${esc(n.target ? n.target.replace(/,/g, ', ') : '전체')} · 항목 ${d.its.map(i => esc(i.label) + (i.type === 'choice' ? '(' + esc(i.opts.replace(/,/g, '/')) + ')' : '')).join(', ')} · 다 낸 학생 ${d.done.length}/${d.t.length}</div></div>
+    <div class="row"><button class="sm" onclick="editNotice('${n.nid}')">✏️ 수정</button><button class="sm" onclick="csvNotice('${n.nid}')">⬇️ CSV</button>
+    <button class="sm" onclick="Store.run('setState',{nid:'${n.nid}',state:'${n.state === '완료' ? '진행' : '완료'}'})">${n.state === '완료' ? '↩️ 다시 받기' : '🏁 완료 처리'}</button>
+    <button class="sm danger" onclick="confirm('「${esc(n.title)}」과 회신 기록을 모두 지울까요?')&&Store.run('delNotice',{nid:'${n.nid}'})">🗑</button></div></div></div>`; }).join('') : '<div class="card empty">등록된 통신문이 없어요.</div>'}
+  <p class="muted">회신을 다 받은 통신문은 <b>🏁 완료 처리</b>하면 체크 화면에서 빠지고 기록은 남아요.</p>`;
+}
+const PRESET = { check: ['회신서 제출', 'check', ''], agree: ['동의 여부', 'choice', '동의,비동의'], join: ['참가 여부', 'choice', '참가,불참'], apply: ['신청 여부', 'choice', '신청,미신청'] };
+function editNotice(nid) {
+  const n = nid ? DB().notices.find(x => x.nid === nid) : null;
+  let items = n ? itemsOf(nid).map(i => ({ iid: i.iid, label: i.label, type: i.type, opts: i.opts })) : [{ label: '회신서 제출', type: 'check', opts: '' }];
+  const cs = classes(), tg = n && n.target ? n.target.split(',') : [];
+  const m = modal(`<h3>${n ? '✏️ 통신문 수정' : '➕ 새 통신문'}</h3>
+  <label class="f">제목</label><input id="nT" style="width:100%" value="${esc(n ? n.title : '')}" placeholder="예: 겨울 현장체험학습 참가 동의서">
+  <label class="f">회신 마감일</label><input id="nD" type="date" value="${esc(n ? n.due : '')}">
+  ${cs.length > 1 ? `<label class="f">대상 학급 (아무것도 안 고르면 전체)</label><div class="chips" id="nC">${cs.map(c => `<button class="chip" aria-pressed="${tg.includes(c)}" data-c="${esc(c)}" onclick="this.setAttribute('aria-pressed',this.getAttribute('aria-pressed')!=='true')">${esc(c)}</button>`).join('')}</div>` : ''}
+  <label class="f">회신 항목 <span style="font-weight:400">— 한 통신문에 체크할 것이 여러 개면 항목을 나눠요</span></label><div id="its"></div>
+  <div class="row" style="margin-top:6px"><span class="muted">빠르게 추가:</span>${Object.entries(PRESET).map(([k, p]) => `<button class="sm" data-p="${k}">+ ${p[0]}${p[2] ? ' (' + p[2].replace(',', '/') + ')' : ''}</button>`).join('')}<button class="sm" data-p="">+ 직접 입력</button></div>
+  <div class="row" style="justify-content:flex-end;margin-top:18px"><button data-close>취소</button><button class="btn" id="nOk">저장</button></div>`);
+  m.querySelector('.mbox').style.maxWidth = '720px';
+  const draw = () => {
+    m.querySelector('#its').innerHTML = items.map((it, i) => `<div class="itrow"><input data-k="label" data-i="${i}" value="${esc(it.label)}" placeholder="항목 이름 (예: 사진 촬영 동의)">
+    <select data-k="type" data-i="${i}"><option value="check" ${it.type === 'check' ? 'selected' : ''}>냈는지만 체크</option><option value="choice" ${it.type === 'choice' ? 'selected' : ''}>선택형</option></select>
+    <input data-k="opts" data-i="${i}" value="${esc(it.opts)}" placeholder="선택지를 쉼표로 (예: 동의,비동의)" ${it.type === 'choice' ? '' : 'disabled style="visibility:hidden"'}>
+    <div class="row" style="flex-wrap:nowrap"><button class="sm" data-up="${i}" ${i ? '' : 'disabled'}>↑</button><button class="sm danger" data-del="${i}">✕</button></div></div>`).join('') || '<p class="muted">항목을 추가해 주세요.</p>';
+  };
+  draw();
+  m.addEventListener('input', e => { const i = e.target.dataset.i; if (i != null) items[i][e.target.dataset.k] = e.target.value; });
+  m.addEventListener('change', e => { if (e.target.dataset.k === 'type') { items[e.target.dataset.i].type = e.target.value; if (e.target.value === 'choice' && !items[e.target.dataset.i].opts) items[e.target.dataset.i].opts = '동의,비동의'; draw(); } });
+  m.addEventListener('click', e => {
+    const t = e.target;
+    if (t.dataset.p != null) { const p = PRESET[t.dataset.p]; items.push(p ? { label: p[0], type: p[1], opts: p[2] } : { label: '', type: 'check', opts: '' }); draw(); }
+    if (t.dataset.del != null) { items.splice(+t.dataset.del, 1); draw(); }
+    if (t.dataset.up != null) { const i = +t.dataset.up; [items[i - 1], items[i]] = [items[i], items[i - 1]]; draw(); }
+  });
+  m.querySelector('#nOk').onclick = () => {
+    const target = [...m.querySelectorAll('#nC [aria-pressed=true]')].map(b => b.dataset.c).join(',');
+    if (n && n.nid && itemsOf(nid).some(i => !items.find(x => x.iid === i.iid)) && !confirm('지운 항목의 회신 기록도 함께 지워져요. 저장할까요?')) return;
+    if (Store.run('saveNotice', { nid: n ? n.nid : '', title: m.querySelector('#nT').value, due: m.querySelector('#nD').value, target, items })) { m.remove(); UI.sel = null; toast('저장했어요'); }
+  };
+  setTimeout(() => m.querySelector('#nT').focus(), 50);
+}
+
+/* ---------- 학생 ---------- */
+function vStu() {
+  const cs = classes(), def = LS.get(APP_KEY + '-defcls', cs[0] || '');
+  return `<div class="grid2"><div class="card"><h2>➕ 학생 등록</h2>
+  <p class="muted" style="margin:0 0 6px">한 줄에 한 명씩 <b>번호 이름</b> 또는 <b>학급 번호 이름</b>으로 적어요. 엑셀에서 복사해 붙여 넣어도 돼요.<br>여러 학급을 함께 관리하면(학생회·업무용) 학급을 적어 주세요.</p>
+  <label class="f">학급을 안 적은 줄의 기본 학급</label><input id="defCls" value="${esc(def)}" placeholder="예: 4-1">
+  <textarea id="stuPaste" style="margin-top:8px" placeholder="1 김하늘&#10;2 이도윤&#10;5-1 3 박서연"></textarea>
+  <div class="row" style="justify-content:flex-end;margin-top:8px"><button class="btn" onclick="addStu()">등록하기</button></div></div>
+  <div class="card"><h2>👧 명단 (${DB().students.length}명)</h2>${DB().students.length ? `<table class="list"><tr><th>학급</th><th>번호</th><th>이름</th><th></th></tr>${DB().students.map(s => `<tr><td>${esc(s.cls)}</td><td>${esc(s.no)}</td><td><b>${esc(s.name)}</b></td><td><button class="sm danger" onclick="confirm('${esc(s.name)} 학생을 지울까요?')&&Store.run('delStudent',{cls:'${esc(s.cls)}',no:'${esc(s.no)}'})">지우기</button></td></tr>`).join('')}</table>` : '<div class="empty">아직 학생이 없어요.</div>'}</div></div>`;
+}
+function addStu() {
+  const def = $('#defCls').value.trim(); LS.set(APP_KEY + '-defcls', def);
+  const list = $('#stuPaste').value.split(/\r?\n/).map(l => l.trim()).filter(Boolean).map(line => {
+    const c = line.split(/[\t,]+|\s+/).filter(Boolean);
+    if (c.length >= 3 && /^\d+$/.test(c[1])) return { cls: c[0], no: c[1], name: c.slice(2).join(' ') };
+    if (/^\d+$/.test(c[0])) return { cls: def, no: c[0], name: c.slice(1).join(' ') };
+    return null;
+  }).filter(s => s && s.name);
+  if (!list.length) return toast('「번호 이름」 형식으로 적어 주세요', true);
+  if (Store.run('addStudents', { list })) toast('👧 ' + list.length + '명 등록했어요');
+}
+
+/* ---------- 설정 ---------- */
+function vSet() {
+  const c = Store.cfg();
+  return `<div class="card" style="max-width:680px"><h2>🔗 구글 시트 연결</h2>
+  <label class="f">Apps Script 웹 앱 주소 (…/exec 로 끝나요)</label><input id="sUrl" style="width:100%" value="${esc(c.url)}" placeholder="https://script.google.com/macros/s/…/exec">
+  <label class="f">연결 비밀번호 (Code.gs 맨 위 PASSWORD와 같게)</label><input id="sPw" type="password" style="width:100%" value="${esc(c.pw)}">
+  <div class="row" style="margin-top:12px"><button class="btn" onclick="saveConn()">저장하고 연결</button>${c.url ? '<button onclick="disconnect()">연결 끊기(체험 모드)</button>' : ''}</div>
+  <p class="muted">주소와 비밀번호는 이 기기 브라우저에만 저장돼요. 연결하면 다른 컴퓨터·태블릿에서도 같은 회신 기록을 보고 함께 체크할 수 있어요(30초마다 새로고침).</p></div>
+  ${!c.url ? `<div class="card" style="max-width:680px"><h2>🧪 체험 자료</h2><button class="danger" onclick="if(confirm('이 기기의 체험 자료를 지우고 예시로 되돌릴까요?')){LS.set(APP_KEY+'-db',null);Store.init()}">예시로 초기화</button> <button class="danger" onclick="if(confirm('체험 자료를 모두 비울까요?')){LS.set(APP_KEY+'-db',emptyDb());Store.init()}">모두 비우기</button></div>` : ''}`;
+}
+async function saveConn() {
+  const url = $('#sUrl').value.trim(), pw = $('#sPw').value;
+  if (url && !/^https:\/\/script\.google\.com\/.+\/exec$/.test(url)) return toast('주소는 https://script.google.com/… /exec 형태여야 해요', true);
+  Store.setCfg({ url, pw });
+  try { await Store.init(); toast('✅ 구글 시트에 연결했어요'); go('check'); } catch (e) { toast('연결 실패: ' + e.message, true); }
+}
+function disconnect() { Store.setCfg({ url: '', pw: '' }); Store.init(); toast('체험 모드로 바꿨어요'); }
+
+/* ---------- 시작 ---------- */
+document.addEventListener('click', e => { const t = e.target.closest('[data-tab]'); if (t) go(t.dataset.tab); });
+$('#clsSel').onchange = e => { UI.cls = e.target.value; LS.set(APP_KEY + '-cls', UI.cls); render(); };
+Store.onChange = soft => render(soft);
+Store.onSync = (s, m) => { const el = $('#sync'); el.className = 'sync' + (s === 'err' ? ' err' : ''); el.textContent = s === 'local' ? '🧪 체험 모드' : s === 'saving' ? '⏳ 저장 중…' : s === 'ok' ? '✅ 시트와 연결됨' : '⚠️ 연결 문제'; el.title = m || ''; };
+Store.init().catch(() => go('set'));
+setInterval(() => { if (!document.querySelector('.modal:not([data-stu])')) Store.refresh(); }, 30000);
+</script>
+</body>
+</html>
