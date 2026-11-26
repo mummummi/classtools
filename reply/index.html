@@ -208,6 +208,10 @@ function core(db, req, today) {
         else db.resps.push({ iid, cls, no, name: S(r.name), val, at: today });
       });
       dirty.resps = 1; break;
+    case 'restore': {
+      Object.keys(SCHEMA).forEach(k => { db[k] = (p.db && Array.isArray(p.db[k]) ? p.db[k] : []).map(r => { const o = {}; SCHEMA[k].forEach(c => o[c[0]] = S(r[c[0]])); return o; }); dirty[k] = 1; });
+      break;
+    }
     default: fail('알 수 없는 요청: ' + req.action);
   }
   return { dirty: Object.keys(dirty) };
@@ -363,7 +367,7 @@ function render(soft) {
   if (soft && (document.querySelector('.pop') || (document.activeElement && /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)))) return;
   const sc = $('.board') && $('.board').scrollTop, sl = $('.board') && $('.board').scrollLeft;
   const f = { check: vCheck, miss: vMiss, notice: vNotice, stu: vStu, set: vSet }[UI.tab];
-  const demo = DB().notices.some(n => /^Ndemo/.test(n.nid));
+  const demo = !Store.remote() && DB().notices.some(n => /^Ndemo/.test(n.nid));
   $('#main').innerHTML = (demo ? `<div class="banner"><span>지금 보이는 통신문과 학생은 <b>예시</b>예요. 둘러본 뒤 지우고 시작하세요. 기록은 이 기기 브라우저에 저장돼요.</span><button class="sm btn" onclick="if(confirm('예시 자료를 모두 지우고 빈 상태로 시작할까요?')){LS.set(APP_KEY+'-db',emptyDb());Store.init()}">예시 지우고 시작하기</button></div>` : '') + f();
   const b = $('.board'); if (b && sc != null) { b.scrollTop = sc; b.scrollLeft = sl; }
   const pm = document.querySelector('.modal[data-stu]'); if (pm) drawStuPanel(pm);
@@ -552,13 +556,29 @@ function addStu() {
 
 /* ---------- 설정 ---------- */
 function vSet() {
-  return PH('자료 관리', '회신 기록은 이 기기 브라우저에만 저장돼요. 기기를 바꾸거나 브라우저 기록을 지우기 전에 백업해 두세요.') + `<div class="grid2">
-  <div class="card"><h2>백업</h2><p class="muted" style="margin:0 0 12px">학생 명단, 통신문, 회신 기록을 파일 하나로 저장해요. 다른 컴퓨터에서 불러오면 그대로 이어서 쓸 수 있어요.</p>
-  <div class="row"><button class="btn" onclick="backup()">백업 파일 저장</button><label class="row" style="cursor:pointer"><span class="sm" style="border:1px solid var(--rule);border-radius:4px;padding:8px 14px;font-weight:600;background:#fff">백업 불러오기</span><input type="file" accept=".json,application/json" hidden onchange="restore(this.files[0])"></label></div></div>
-  <div class="card"><h2>처음부터 다시</h2><p class="muted" style="margin:0 0 12px">모든 기록을 지워요. 되돌릴 수 없으니 먼저 백업하세요.</p>
+  const c = Store.cfg();
+  return PH('자료 관리', c.url ? '구글 시트에 저장돼서 연결한 모든 기기에서 같은 회신 대장을 봐요. 30초마다 새로 불러와요.' : '지금은 이 기기 브라우저에만 저장돼요. 구글 시트에 연결하면 다른 기기에서도 같이 볼 수 있어요.') + `
+  <div class="grid2"><div class="card"><h2>구글 시트 연결</h2>
+  <label class="f">Apps Script 웹 앱 주소 (…/exec 로 끝나요)</label><input id="sUrl" style="width:100%" value="${esc(c.url)}" placeholder="https://script.google.com/macros/s/…/exec">
+  <label class="f">연결 비밀번호 (Code.gs 맨 위 PASSWORD와 같게)</label><input id="sPw" type="password" style="width:100%" value="${esc(c.pw)}">
+  <div class="row" style="margin-top:14px"><button class="btn" onclick="saveConn()">저장하고 연결</button>${c.url ? '<button onclick="disconnect()">연결 끊기</button>' : ''}</div>
+  ${!c.url && DB().notices.length && !DB().notices.some(n => /^Ndemo/.test(n.nid)) ? '<p class="muted">이 기기에 있던 기록을 시트로 옮기려면, 연결하기 전에 아래 <b>백업 파일 저장</b>을 먼저 해 두고 연결 후 <b>백업 불러오기</b>를 하세요.</p>' : ''}</div>
+  <div class="card"><h2>다른 기기에서 열기</h2>${c.url ? `<p class="muted" style="margin:0 0 10px">이 주소를 다른 컴퓨터나 태블릿에서 한 번 열면 시트 연결까지 저절로 돼요. 연결 정보가 들어 있으니 선생님 기기에서만 여세요.</p>
+  <div class="row"><input id="devUrl" readonly style="flex:1;min-width:200px" value="${esc(devLink())}"><button class="btn" onclick="copyText($('#devUrl').value)">주소 복사</button></div>` : '<p class="muted" style="margin:0">구글 시트에 연결하면 다른 기기에 넣을 주소가 여기에 나와요.</p>'}</div></div>
+  <div class="grid2"><div class="card"><h2>백업</h2><p class="muted" style="margin:0 0 12px">학생 명단, 통신문, 회신 기록을 파일 하나로 저장하거나 불러와요.${c.url ? ' 불러오면 시트 내용이 백업 내용으로 바뀌어요.' : ''}</p>
+  <div class="row"><button class="btn" onclick="backup()">백업 파일 저장</button><label class="row" style="cursor:pointer"><span style="border:1px solid var(--rule);border-radius:4px;padding:8px 14px;font-weight:600;background:#fff">백업 불러오기</span><input type="file" accept=".json,application/json" hidden onchange="restore(this.files[0])"></label></div></div>
+  ${c.url ? '' : `<div class="card"><h2>처음부터 다시</h2><p class="muted" style="margin:0 0 12px">이 기기의 기록을 모두 지워요. 되돌릴 수 없으니 먼저 백업하세요.</p>
   <div class="row"><button class="danger" onclick="if(confirm('학생 명단과 통신문, 회신 기록을 모두 지울까요? 되돌릴 수 없어요.')){LS.set(APP_KEY+'-db',emptyDb());Store.init();toast('모두 지웠어요')}">모두 지우기</button>
-  <button onclick="if(confirm('지금 자료를 지우고 예시 자료를 불러올까요?')){LS.set(APP_KEY+'-db',null);Store.init()}">예시 자료 불러오기</button></div></div></div>`;
+  <button onclick="if(confirm('지금 자료를 지우고 예시 자료를 불러올까요?')){LS.set(APP_KEY+'-db',null);Store.init()}">예시 자료 불러오기</button></div></div>`}</div>`;
 }
+function devLink() { const c = Store.cfg(); return location.origin + location.pathname + '#c=' + btoa(unescape(encodeURIComponent(JSON.stringify({ u: c.url, p: c.pw })))); }
+async function saveConn() {
+  const url = $('#sUrl').value.trim(), pw = $('#sPw').value;
+  if (url && !/^https:\/\/script\.google\.com\/.+\/exec$/.test(url)) return toast('주소는 https://script.google.com/… /exec 형태여야 해요', true);
+  Store.setCfg({ url, pw });
+  try { await Store.init(); toast('구글 시트에 연결했어요'); render(); } catch (e) { toast('연결 실패: ' + e.message, true); }
+}
+function disconnect() { Store.setCfg({ url: '', pw: '' }); Store.init(); toast('이 기기 저장으로 바꿨어요'); }
 function backup() {
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([JSON.stringify({ app: APP_KEY, at: new Date().toISOString(), db: Store.db }, null, 1)], { type: 'application/json' }));
@@ -566,7 +586,12 @@ function backup() {
 }
 function restore(f) {
   if (!f) return; const r = new FileReader();
-  r.onload = () => { try { const o = JSON.parse(r.result); if (o.app !== APP_KEY || !o.db) throw 0; if (!confirm('지금 자료를 백업 파일 내용으로 바꿀까요?')) return; LS.set(APP_KEY + '-db', Object.assign(emptyDb(), o.db)); Store.init(); toast('백업을 불러왔어요'); go('check'); } catch (_) { toast('이 앱의 백업 파일이 아니에요', true); } };
+  r.onload = () => {
+    let o; try { o = JSON.parse(r.result); if (o.app !== APP_KEY || !o.db) throw 0; } catch (_) { return toast('이 앱의 백업 파일이 아니에요', true); }
+    if (!confirm('지금 자료를 백업 파일 내용으로 바꿀까요?')) return;
+    if (Store.remote()) { if (Store.run('restore', { db: o.db })) { toast('백업을 시트로 불러왔어요'); go('check'); } }
+    else { LS.set(APP_KEY + '-db', Object.assign(emptyDb(), o.db)); Store.init(); toast('백업을 불러왔어요'); go('check'); }
+  };
   r.readAsText(f);
 }
 
@@ -574,8 +599,11 @@ function restore(f) {
 document.addEventListener('click', e => { const t = e.target.closest('[data-tab]'); if (t) go(t.dataset.tab); });
 $('#clsSel').onchange = e => { UI.cls = e.target.value; LS.set(APP_KEY + '-cls', UI.cls); render(); };
 Store.onChange = soft => render(soft);
-Store.remote = () => false;
-Store.onSync = () => { $('#sync').textContent = '이 기기 브라우저에 저장 중'; };
+(function () { // 다른 기기용 주소(#c=…)로 열면 연결 정보 저장
+  const m = /#c=([^&]+)/.exec(location.hash);
+  if (m) { try { const o = JSON.parse(decodeURIComponent(escape(atob(m[1])))); Store.setCfg({ url: o.u, pw: o.p }); } catch (_) {} history.replaceState(null, '', location.pathname); }
+})();
+Store.onSync = (s, m) => { const el = $('#sync'); el.textContent = s === 'local' ? '이 기기에만 저장 중' : s === 'saving' ? '시트에 저장 중…' : s === 'ok' ? '구글 시트 연결됨 · 다른 기기와 공유' : '시트 연결 문제'; el.title = m || ''; el.style.color = s === 'err' ? '#F09A92' : ''; };
 Store.init().catch(() => go('set'));
 setInterval(() => { if (!document.querySelector('.modal:not([data-stu])')) Store.refresh(); }, 30000);
 </script>
